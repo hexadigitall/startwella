@@ -2,33 +2,64 @@
   "version": 2,
   "public": true,
   "cleanUrls": true,
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/sw.js",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/startwella-v1/sw.js",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
+      ]
+    }
+  ],
   "routes": [
+    {
+      "src": "/sw.js",
+      "dest": "/sw.js",
+      "headers": {
+        "cache-control": "no-cache, no-store, must-revalidate"
+      }
+    },
+    {
+      "src": "/startwella-v1/sw.js",
+      "dest": "/startwella-v1/sw.js",
+      "headers": {
+        "cache-control": "no-cache, no-store, must-revalidate"
+      }
+    },
     {
       "src": "/manifest.json",
       "dest": "/startwella-v1/manifest.json"
     },
     {
-      "src": "/sw.js",
-      "dest": "/startwella-v1/sw.js",
-      "headers": {
-        "cache-control": "public, max-age=0, must-revalidate"
-      }
-    },
-    {
       "src": "/assets/(.*)",
-      "dest": "/startwella-v1/assets/$1"
+      "dest": "/assets/$1"
     },
     {
       "src": "/src/(.*)",
-      "dest": "/startwella-v1/src/$1"
+      "dest": "/src/$1"
+    },
+    {
+      "src": "/startwella-v1/(.*)",
+      "dest": "/startwella-v1/$1"
     },
     {
       "src": "/",
-      "dest": "/startwella-v1/index.html"
+      "dest": "/index.html"
     },
     {
       "src": "/(.*)",
-      "dest": "/startwella-v1/$1"
+      "dest": "/index.html"
     }
   ]
 }

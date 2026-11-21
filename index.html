@@ -2,10 +2,1483 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="refresh" content="0; url=startwella-v1/index.html">
-  <title>StartWella — Redirecting</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0EA47A">
+  <meta name="description" content="StartWella — In 5 minutes, know your true cost, your correct price, and how many sales to break even.">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+  <title>StartWella — Start well. Price right. Grow steady.</title>
+  <script>
+    // Immediate PWA cache bust for older versions
+    if ('caches' in window) {
+      caches.keys().then(function(keys) {
+        keys.forEach(function(k) {
+          if (k !== 'startwella-v1.0.3-20261121') caches.delete(k);
+        });
+      });
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #EEF2F5; color: #1A2B3C; line-height: 1.5; padding-bottom: 40px; }
+    
+    header { background: #fff; padding: 12px 16px; border-bottom: 2px solid #0EA47A; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; }
+    .brand-title { font-size: 20px; font-weight: 800; color: #0F2A44; letter-spacing: -0.5px; display: flex; align-items: center; }
+    .brand-sub { font-size: 12px; color: #5A6B7C; }
+    .version-tag { font-size: 11px; font-weight: 700; background: #EAF6F1; color: #0EA47A; border: 1px solid #0EA47A; border-radius: 6px; padding: 2px 7px; margin-left: 8px; cursor: pointer; line-height: 1.2; }
+    .version-tag:hover { background: #0EA47A; color: #fff; }
+    
+    .curr-select { font-size: 13px; font-weight: 700; background: #EAF6F1; color: #0F2A44; border: 1px solid #0EA47A; border-radius: 8px; padding: 6px 10px; cursor: pointer; }
+
+    main { max-width: 680px; margin: 0 auto; padding: 14px; }
+    .card { background: #fff; border-radius: 14px; padding: 18px 16px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(15,42,68,0.06); }
+    
+    h2 { font-size: 19px; color: #0F2A44; margin-bottom: 6px; font-weight: 700; }
+    h3 { font-size: 16px; color: #0F2A44; margin: 18px 0 8px; font-weight: 700; }
+    .muted { font-size: 13px; color: #5A6B7C; line-height: 1.4; margin-top: 4px; }
+
+    label { display: block; margin: 14px 0 5px; font-weight: 600; font-size: 14px; color: #0F2A44; }
+    input, select { width: 100%; height: 50px; padding: 0 14px; border: 1px solid #D6DEE6; border-radius: 10px; font-size: 16px; color: #1A2B3C; background: #FAFCFD; }
+    input:focus, select:focus { outline: none; border-color: #0EA47A; background: #fff; }
+
+    button { display: block; width: 100%; height: 50px; border: 0; border-radius: 10px; background: #0EA47A; color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 12px; transition: opacity 0.15s ease; }
+    button:active { opacity: 0.85; }
+
+    .tabs { display: flex; gap: 6px; overflow: hidden; flex-wrap: nowrap; padding-bottom: 4px; margin-bottom: 12px; align-items: center; }
+    .tabs button { flex: 0 0 auto; width: auto; height: 42px; margin-top: 0; padding: 0 12px; background: #EAF6F1; color: #0F2A44; font-size: 13px; white-space: nowrap; border-radius: 8px; }
+    .tabs button.tab-current { flex: 1 1 auto; min-width: 0; text-align: left; background: #0F2A44; color: #fff; font-weight: 700; overflow: hidden; text-overflow: ellipsis; }
+    .tabs button.tab-num { flex: 0 0 42px; width: 42px; padding: 0; font-weight: 700; text-align: center; }
+
+    .phase2-bar { height: 6px; background: #E2EAF0; border-radius: 99px; overflow: hidden; margin: 4px 0 6px; }
+    .phase2-fill { height: 100%; background: #0EA47A; width: 25%; transition: width 0.25s ease; }
+
+    .step-nav { display: flex; gap: 10px; margin-top: 16px; }
+    .step-nav button { flex: 1; margin-top: 0; }
+    .ghost { background: #EEF2F5 !important; color: #0F2A44 !important; border: 1px solid #D6DEE6 !important; }
+
+    .result-card { border: 1px solid #D9EADF; background: #F2FAF6; border-radius: 12px; padding: 16px; margin-top: 14px; }
+    .result-card h3 { margin-top: 0; color: #0F2A44; font-size: 17px; }
+    .result-card p { font-size: 14px; margin-top: 6px; color: #1A2B3C; }
+
+    .loss-banner { background: #FDECEC; border: 1px solid #F5C6C6; color: #8B1A1A; border-radius: 10px; padding: 12px; margin-top: 12px; font-weight: 600; font-size: 14px; line-height: 1.4; }
+    .safe-banner { background: #E6F6EE; border: 1px solid #BFE8CD; color: #145A32; border-radius: 10px; padding: 12px; margin-top: 12px; font-weight: 600; font-size: 14px; line-height: 1.4; }
+    .next-action { background: #FFF7E6; border: 1px solid #F5D98A; border-radius: 10px; padding: 12px; margin-top: 12px; font-size: 13px; line-height: 1.4; color: #5B4100; }
+
+    /* CUSTOM ROWS FOR STEP 1, 2, 3, 4 */
+    .custom-row { position: relative; margin: 12px 0; background: #F9FBFC; border: 1px solid #E2EAF0; border-radius: 10px; padding: 12px 14px; }
+    .custom-row .remove-x { position: absolute; top: 10px; right: 10px; width: 28px !important; height: 28px !important; border-radius: 50%; background: #FDECEC !important; color: #D32F2F !important; font-size: 18px; line-height: 1; padding: 0; margin: 0; }
+    .custom-row label { margin-top: 0; padding-right: 36px; }
+    .custom-row input { margin-top: 6px; background: #fff; }
+
+    .badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 6px; background: #EAF6F1; color: #0EA47A; margin-left: 6px; vertical-align: middle; }
+    .badge-warn { background: #FFF7E6; color: #B26B00; }
+    .badge-blue { background: #EBF3FA; color: #1D6FBE; }
+
+    .bundle-grid { display: grid; grid-template-columns: 80px 1fr 100px; gap: 8px; align-items: center; margin-top: 6px; }
+    .bundle-grid input { height: 44px; font-size: 14px; }
+    .bundle-subtotal { font-size: 13px; font-weight: 700; color: #0F2A44; text-align: right; }
+
+    .saved-row { display: flex; gap: 8px; align-items: center; padding: 12px 0; border-bottom: 1px solid #EEF2F5; }
+    .saved-row .meta { flex: 1; min-width: 0; }
+    .saved-row .meta b { font-size: 15px; color: #0F2A44; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .saved-row button { width: auto; height: 38px; margin-top: 0; padding: 0 10px; font-size: 13px; font-weight: 600; }
+    .saved-row .del { background: #FDECEC !important; color: #D32F2F !important; }
+    .saved-row .load { background: #EAF6F1 !important; color: #0F2A44 !important; }
+    .saved-row .wa { background: #25D366 !important; }
+
+    /* SUGGESTION CHIPS */
+    .chip-label { font-size: 12px; font-weight: 700; color: #5A6B7C; margin-top: 10px; text-transform: uppercase; letter-spacing: 0.5px; display: block; }
+    .chip-container { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 12px; }
+    .chip { background: #EAF6F1; color: #0F2A44; border: 1px solid #BFE8CD; border-radius: 99px; padding: 6px 11px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s ease; text-align: left; }
+    .chip:hover, .chip:active { background: #0EA47A; color: #fff; border-color: #0EA47A; }
+
+    /* DISCOUNT DANGER ZONE TABLE */
+    .dz-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+    .dz-table th, .dz-table td { padding: 8px 10px; border-bottom: 1px solid #E2EAF0; text-align: left; }
+    .dz-table th { background: #EAF6F1; color: #0F2A44; font-weight: 700; }
+    .dz-safe { color: #145A32; font-weight: 700; }
+    .dz-loss { color: #8B1A1A; font-weight: 700; }
+
+    /* MODAL ARCHITECTURE */
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(15,42,68,0.65); display: none; align-items: flex-end; justify-content: center; z-index: 999; }
+    .modal-backdrop.open { display: flex; }
+    .modal { background: #fff; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; border-radius: 18px 18px 0 0; padding: 22px 18px; box-shadow: 0 -4px 20px rgba(0,0,0,0.15); }
+    .modal-head { display: flex; justify-content: space-between; align-items: center; }
+    .modal-close { width: 34px !important; height: 34px !important; border-radius: 50%; background: #EEF2F5 !important; color: #0F2A44 !important; font-size: 20px; padding: 0; margin: 0; }
+    
+    .segmented { display: flex; background: #EEF2F5; border-radius: 10px; padding: 4px; margin: 10px 0 14px; gap: 4px; }
+    .segmented button { flex: 1; height: 38px; margin-top: 0; font-size: 13px; background: transparent; color: #5A6B7C; font-weight: 600; border-radius: 7px; }
+    .segmented button.active { background: #fff; color: #0F2A44; box-shadow: 0 1px 3px rgba(0,0,0,0.08); font-weight: 700; }
+
+    .calc-preview-box { background: #EAF6F1; border: 1px solid #BFE8CD; border-radius: 10px; padding: 12px; margin: 12px 0; font-size: 13px; color: #0F2A44; }
+    .calc-preview-box b { font-size: 15px; color: #0EA47A; }
+
+    .actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+    .actions-grid button { margin-top: 0; }
+
+    @media print {
+      body { background: #fff; color: #000; padding: 0; }
+      header, .tabs, .phase2-bar, #phase2Step, .step-nav, button, select, .curr-select, .modal-backdrop { display: none !important; }
+      main { max-width: 100%; padding: 0; }
+      .card { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
+    }
+  </style>
 </head>
 <body>
-  <p>Redirecting to <a href="startwella-v1/index.html">StartWella App</a>...</p>
+
+<header>
+  <div>
+    <div class="brand-title">StartWella <span class="version-tag" onclick="forceAppRefresh()" title="Click to clear cache and reload latest version">v1.0.3 ⟳</span></div>
+    <div class="brand-sub">Start well. Price right. Grow steady.</div>
+  </div>
+  <div>
+    <select id="currSelect" class="curr-select" onchange="onCurrencyChange()">
+      <option value="NGN">₦ NGN</option>
+      <option value="USD">$ USD</option>
+      <option value="GHS">GH₵ GHS</option>
+    </select>
+  </div>
+</header>
+
+<main>
+  <div class="phase2-bar"><div id="phase2Fill" class="phase2-fill"></div></div>
+  <div id="phase2Step" class="muted">1. What should I charge?</div>
+  <div id="stepTabs" class="tabs"></div>
+
+  <!-- STEP 1: PRICE CALCULATOR (UNIT TRUE COST) -->
+  <section id="price" class="card">
+    <h2>1. Price Calculator — What should I charge?</h2>
+    <div class="muted">Know what one unit costs you so you never sell at a loss.</div>
+
+    <label>What are you selling?</label>
+    <input id="pname" value="Oloyin Beans — 1kg" oninput="onProductNameChange()">
+
+    <label>1. Cost of the stock itself — for ONE unit (<span class="cSym">₦</span>)</label>
+    <input id="bulk" type="text" inputmode="numeric" value="2,000">
+    <div class="muted">Example: Bag of 50kg was ₦100,000. For 1kg, type 2,000.</div>
+
+    <label>2. Transport — for ONE unit (<span class="cSym">₦</span>)</label>
+    <input id="trans" type="text" inputmode="numeric" value="150">
+
+    <label>3. Packaging — for ONE unit (<span class="cSym">₦</span>)</label>
+    <input id="pack" type="text" inputmode="numeric" value="180">
+    <div class="muted">Bag, seal, container, or label for this one unit.</div>
+
+    <label>4. Labour to clean / sort / pack ONE unit (<span class="cSym">₦</span>)</label>
+    <input id="lab" type="text" inputmode="numeric" value="120">
+
+    <h3>Anything else you spend for ONE unit?</h3>
+    <div class="muted">Add custom unit expenses (e.g. park errand boy, sealing tape, generator fuel).</div>
+    <div id="pCustom"></div>
+    <button type="button" onclick="openStepModal('price')" style="background:#EAF6F1;color:#0F2A44">
+      + Add another cost for ONE unit
+    </button>
+
+    <label>How much is lost when you clean / sort it? (out of 100 %)</label>
+    <input id="waste" type="text" inputmode="numeric" value="5">
+    <div class="muted">If 100kg gives 95kg clean stock, type 5. If nothing lost, type 0.</div>
+
+    <label>How much profit do you want on top of your cost? (%)</label>
+    <input id="profit" type="text" inputmode="numeric" value="30">
+    <div class="muted">Type 30 if you want ₦30 profit for every ₦100 spent.</div>
+
+    <label>What price are you charging now? (<span class="cSym">₦</span>)</label>
+    <input id="sell" type="text" inputmode="numeric" value="3,350">
+
+    <button type="button" onclick="calcPrice()">Calculate my price</button>
+    <div id="priceOut"></div>
+
+    <div class="actions-grid">
+      <button type="button" onclick="shareWA()" style="background:#25D366">Share on WhatsApp</button>
+      <button type="button" onclick="saveProduct()" style="background:#0F2A44">Save product</button>
+    </div>
+    <button type="button" onclick="exportPDF()" class="ghost">Print / Export as PDF</button>
+
+    <div class="step-nav">
+      <button type="button" class="ghost" onclick="prevCalc()">Back</button>
+      <button type="button" onclick="nextCalc()">Next: How much to start</button>
+    </div>
+  </section>
+
+  <!-- STEP 2: STARTUP COST ESTIMATOR (ONE-TIME CAPITAL) -->
+  <section id="startup" class="card" style="display:none">
+    <h2>2. Startup Cost — How much money do I need to start?</h2>
+    <p class="muted">All the money you need to spend <b>once</b> before you sell your first pack.</p>
+
+    <label>What kind of business?</label>
+    <select id="tmpl" onchange="loadTmpl()">
+      <option value="foodstuff">Foodstuff — rice, beans, pepper, garri</option>
+      <option value="baking">Baking — cakes, bread, snacks</option>
+      <option value="skincare">Skincare / Cosmetics</option>
+      <option value="thrift">Thrift / Fashion</option>
+      <option value="catering">Catering / Drinks</option>
+    </select>
+
+    <h3>What do you need to buy to start?</h3>
+    <p class="muted">Tick if you need it for Day 1. Untick if you already have it or will buy later.</p>
+    <div id="sItems"></div>
+
+    <h3>Anything else you need to start?</h3>
+    <p class="muted">Custom startup items (e.g. shop rent advance, CAC registration, signboard).</p>
+    <div id="sCustom"></div>
+    <button type="button" onclick="openStepModal('startup')" style="background:#EAF6F1;color:#0F2A44">
+      + Add another thing I need to start
+    </button>
+
+    <label>Extra money for surprises (%)</label>
+    <input id="sCont" type="text" inputmode="numeric" value="5">
+    <div class="muted">Prices jump. A bag tears. Type 5 for 5% buffer. Type 0 if none.</div>
+
+    <button type="button" onclick="calcStartup()">Add up — how much do I need?</button>
+    <div id="startupOut"></div>
+
+    <div class="step-nav">
+      <button type="button" class="ghost" onclick="prevCalc()">Back: Price Calculator</button>
+      <button type="button" onclick="nextCalc()">Next: Break-Even</button>
+    </div>
+  </section>
+
+  <!-- STEP 3: BREAK-EVEN CALCULATOR -->
+  <section id="breakeven" class="card" style="display:none">
+    <h2>3. Break-Even — When will I get my money back?</h2>
+    <div class="muted">Find out how many units you must sell to recover your starting capital and cover monthly bills.</div>
+
+    <label>Total money you spent to start (<span class="cSym">₦</span>)</label>
+    <input id="beStart" type="text" inputmode="numeric" value="850,000">
+    <div class="muted">Number from Calculator 2.</div>
+
+    <label>Money you keep from ONE sale (<span class="cSym">₦</span>)</label>
+    <input id="beProfit" type="text" inputmode="numeric" value="771">
+
+    <label>How many packs will you sell in one week?</label>
+    <input id="beWeek" type="text" inputmode="numeric" value="50">
+
+    <h3>Ongoing Monthly Running Costs (Optional)</h3>
+    <div class="muted">Recurring bills you must pay every month (stall rent, light/generator, shop assistant).</div>
+    <div id="beMonthly"></div>
+    <button type="button" onclick="openStepModal('breakeven')" style="background:#EAF6F1;color:#0F2A44">
+      + Add ongoing monthly running bill (Rent, light, salary)
+    </button>
+
+    <button type="button" onclick="calcBE()">When will I break even?</button>
+    <div id="beOut"></div>
+
+    <div class="step-nav">
+      <button type="button" class="ghost" onclick="prevCalc()">Back: Startup Cost</button>
+      <button type="button" onclick="nextCalc()">Next: Bundle & Discount</button>
+    </div>
+  </section>
+
+  <!-- STEP 4: BUNDLE & DISCOUNT CHECKER -->
+  <section id="bundle" class="card" style="display:none">
+    <h2>4. Bundle &amp; Discount — Will this offer lose me money?</h2>
+    <div class="muted">Make sure combo deals and markdown promotions never eat your profit.</div>
+
+    <h3>A. Bundle / Combo Pack Builder</h3>
+    <label>Price you will charge for the whole bundle (<span class="cSym">₦</span>)</label>
+    <input id="bPrice" type="text" inputmode="numeric" value="6,050">
+
+    <label>Items included in this bundle:</label>
+    <div class="muted">Include your products, hamper basket/box, ribbon, and any customer freebie.</div>
+    <div id="bItems">
+      <div class="custom-row" data-name="Oloyin 1kg">
+        <label>Oloyin 1kg</label>
+        <div class="bundle-grid">
+          <div><input type="number" class="bQty" value="1" min="1" oninput="updateBundleLine(this)"></div>
+          <div><input type="text" inputmode="numeric" class="bCost" value="2,579" oninput="updateBundleLine(this)"></div>
+          <div class="bundle-subtotal">= <span class="bLineTotal">₦2,579</span></div>
+        </div>
+        <button type="button" class="remove-x" onclick="this.closest('.custom-row').remove(); calcBundle();">×</button>
+      </div>
+      <div class="custom-row" data-name="Rice 1kg">
+        <label>Rice 1kg</label>
+        <div class="bundle-grid">
+          <div><input type="number" class="bQty" value="1" min="1" oninput="updateBundleLine(this)"></div>
+          <div><input type="text" inputmode="numeric" class="bCost" value="2,649" oninput="updateBundleLine(this)"></div>
+          <div class="bundle-subtotal">= <span class="bLineTotal">₦2,649</span></div>
+        </div>
+        <button type="button" class="remove-x" onclick="this.closest('.custom-row').remove(); calcBundle();">×</button>
+      </div>
+    </div>
+    <button type="button" onclick="openStepModal('bundle')" style="background:#EAF6F1;color:#0F2A44">
+      + Add item, packaging or freebie to this bundle
+    </button>
+
+    <h3>B. Discount / Markdown Check</h3>
+    <label>Normal price before discount (<span class="cSym">₦</span>)</label>
+    <input id="dSell" type="text" inputmode="numeric" value="3,350" oninput="calcBundle()">
+
+    <label>True cost of ONE unit (<span class="cSym">₦</span>)</label>
+    <input id="dCost" type="text" inputmode="numeric" value="2,579" oninput="calcBundle()">
+
+    <label>Discount you want to give (%)</label>
+    <input id="dPct" type="text" inputmode="numeric" value="10" oninput="calcBundle()">
+
+    <button type="button" onclick="calcBundle()">Check my bundle &amp; discount</button>
+    <div id="bundleOut"></div>
+
+    <div style="margin-top:16px">
+      <h3>Discount Danger Zone — Where profit turns into loss</h3>
+      <div class="muted">Check how much profit you keep at different discount percentages:</div>
+      <div id="dangerZoneTable"></div>
+    </div>
+
+    <div class="step-nav">
+      <button type="button" class="ghost" onclick="prevCalc()">Back: Break-Even</button>
+      <button type="button" onclick="finishFlow()">Done: See Saved Products</button>
+    </div>
+  </section>
+
+  <!-- SAVED PRODUCTS CATALOG -->
+  <section class="card" id="savedCard">
+    <h3>Saved products</h3>
+    <div class="muted">Load puts it back into Calculator 1. Share sends it on WhatsApp. Delete removes it.</div>
+    <div id="saved" style="margin-top:12px"></div>
+    <div class="actions-grid">
+      <button type="button" onclick="shareFullPriceList()" style="background:#25D366">Share Price List (WhatsApp)</button>
+      <button type="button" onclick="exportPDF()" class="ghost">Export Price List (PDF)</button>
+    </div>
+    <div class="muted" style="margin-top:10px">Saved locally in your device storage. Works offline.</div>
+  </section>
+
+  <!-- FINANCIAL DISCLAIMER & VERSION WATERMARK -->
+  <div class="muted" style="text-align:center;padding:12px;font-size:11px">
+    StartWella provides mathematical estimates for educational and operational planning purposes.
+    Verify supplier prices and local costs before making business commitments.
+    <div style="margin-top:6px;font-weight:700;color:#0F2A44">StartWella v1.0.3 • Dynamic Step-Specific Add Forms (Zero Generic Placeholders)</div>
+  </div>
+</main>
+
+<!-- UNIVERSAL STEP-AWARE MODAL -->
+<div id="stepModal" class="modal-backdrop" onclick="if(event.target===this)closeStepModal()">
+  <div class="modal">
+    <div class="modal-head">
+      <b id="modalTitle" style="font-size:18px;color:#0F2A44">Add Cost</b>
+      <button type="button" class="modal-close" onclick="closeStepModal()">×</button>
+    </div>
+    <p class="muted" id="modalSubtitle" style="margin:4px 0 14px"></p>
+
+    <!-- FORM FOR STEP 1: PRICE CALCULATOR (UNIT COST) -->
+    <div id="modalFormPrice" style="display:none">
+      <span class="chip-label">Quick Suggestions (Tap to fill):</span>
+      <div class="chip-container">
+        <button type="button" class="chip" onclick="applyPriceChip('Park errand runner / dispatch', 'batch', 1500, 30)">🛵 Errand Runner (₦1,500 for 30 packs)</button>
+        <button type="button" class="chip" onclick="applyPriceChip('Branded Logo Sticker', 'direct', 50)">🏷️ Logo Sticker (₦50 each)</button>
+        <button type="button" class="chip" onclick="applyPriceChip('Nylon tie & sealing tape', 'direct', 25)">🎀 Sealing Tape &amp; Tie (₦25 each)</button>
+        <button type="button" class="chip" onclick="applyPriceChip('Generator fuel share for sealing', 'batch', 2000, 40)">⚡ Gen Fuel (₦2,000 for 40 packs)</button>
+        <button type="button" class="chip" onclick="applyPriceChip('Market gate ticket / entry fee', 'batch', 200, 20)">🎫 Gate Entry Fee (₦200 for 20 packs)</button>
+      </div>
+
+      <label>What did you spend money on for this product?</label>
+      <input id="pAddName" placeholder="e.g. Park errand runner, nylon sealing wire, logo sticker, waybill split">
+
+      <label>How did you pay for this?</label>
+      <div class="segmented">
+        <button type="button" id="pModeDirect" class="active" onclick="setPriceCostMode('direct')">Direct for 1 unit</button>
+        <button type="button" id="pModeBatch" onclick="setPriceCostMode('batch')">Batch split across units</button>
+      </div>
+
+      <div id="pDirectFields">
+        <label>Amount for ONE unit (<span class="cSym">₦</span>)</label>
+        <input id="pAddUnitAmount" type="text" inputmode="numeric" placeholder="e.g. 50 (if you already know the cost for just 1 single pack or plate)">
+      </div>
+
+      <div id="pBatchFields" style="display:none">
+        <label>Total amount paid for the whole batch (<span class="cSym">₦</span>)</label>
+        <input id="pAddBatchTotal" type="text" inputmode="numeric" placeholder="e.g. 1,500 (total given to dispatch rider or errand runner)" oninput="updateBatchPreview()">
+        
+        <label>How many units did this batch produce / cover?</label>
+        <input id="pAddBatchCount" type="text" inputmode="numeric" placeholder="e.g. 30 (total packs or items brought from the park)" oninput="updateBatchPreview()">
+
+        <div class="calc-preview-box">
+          Per-unit cost: <b id="pBatchCalcPreview">₦0</b> per unit
+          <div class="muted">We divide the batch cost by units and add it straight to your true cost.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FORM FOR STEP 2: STARTUP COST ESTIMATOR (CAPITAL ITEM) -->
+    <div id="modalFormStartup" style="display:none">
+      <span class="chip-label" id="sChipTitle">Recommended for your business (Tap to fill):</span>
+      <div class="chip-container" id="sChipContainer"></div>
+
+      <label>What startup equipment, machine, or asset do you need?</label>
+      <input id="sAddName" placeholder="e.g. 100kg digital bench scale, shop 6-month rent advance, industrial dough mixer, thrift clothing steamer">
+
+      <label>Category of expense</label>
+      <select id="sAddCategory">
+        <option value="Equipment">🛠️ Equipment &amp; Machines</option>
+        <option value="Space">🏪 Shop Space &amp; Rent Advance</option>
+        <option value="Legal">📜 Business Permits &amp; CAC</option>
+        <option value="Stock">📦 First Stock of Raw Materials</option>
+        <option value="Branding">🎨 Signboard &amp; Branding</option>
+        <option value="Other">💡 Other Startup Need</option>
+      </select>
+
+      <label>Estimated Cost to Buy or Pay Upfront (<span class="cSym">₦</span>)</label>
+      <input id="sAddAmount" type="text" inputmode="numeric" placeholder="e.g. 45,000 (price to buy the scale or equipment)">
+
+      <label>Is this essential for Day 1 launch?</label>
+      <div class="segmented">
+        <button type="button" id="sPriEssential" class="active" onclick="setStartupPriority('essential')">Day 1 Essential (Lean launch)</button>
+        <button type="button" id="sPriLater" onclick="setStartupPriority('later')">Can buy later (Proper setup)</button>
+      </div>
+      <div class="muted" id="sPriHint">Tick-marked by default. Unticking lets you see your leanest budget.</div>
+    </div>
+
+    <!-- FORM FOR STEP 3: BREAK-EVEN (MONTHLY OVERHEAD) -->
+    <div id="modalFormBreakeven" style="display:none">
+      <span class="chip-label">Common Recurring Bills (Tap to fill):</span>
+      <div class="chip-container">
+        <button type="button" class="chip" onclick="applyBreakevenChip('Shop / Stall Rent', 15000, 'monthly')">🏪 Stall Rent (₦15k/mo)</button>
+        <button type="button" class="chip" onclick="applyBreakevenChip('Generator fuel / NEPA light', 3500, 'weekly')">💡 Gen Fuel (₦3.5k/wk)</button>
+        <button type="button" class="chip" onclick="applyBreakevenChip('Shop Assistant / Sales Girl', 6000, 'weekly')">🤝 Sales Girl (₦6k/wk)</button>
+        <button type="button" class="chip" onclick="applyBreakevenChip('Phone Data for WhatsApp Orders', 4000, 'monthly')">📱 WhatsApp Data (₦4k/mo)</button>
+        <button type="button" class="chip" onclick="applyBreakevenChip('Market Security & Sanitation Levy', 2500, 'monthly')">🛡️ Security &amp; Sanitation (₦2.5k/mo)</button>
+      </div>
+
+      <label>What recurring bill is this?</label>
+      <input id="beAddName" placeholder="e.g. Monthly stall rent, generator petrol, sales girl weekly wage, WhatsApp data bundle">
+
+      <label>How often do you pay this?</label>
+      <div class="segmented">
+        <button type="button" id="beFreqMonthly" class="active" onclick="setBreakevenFreq('monthly')">Monthly</button>
+        <button type="button" id="beFreqWeekly" onclick="setBreakevenFreq('weekly')">Weekly (4 weeks/mo)</button>
+      </div>
+
+      <label id="beAmountLabel">Amount (<span class="cSym">₦</span> per month)</label>
+      <input id="beAddAmount" type="text" inputmode="numeric" placeholder="e.g. 15,000 (if monthly) or 3,500 (if weekly)" oninput="updateBreakevenPreview()">
+      
+      <div class="calc-preview-box">
+        Effective monthly bill: <b id="beMonthlyPreview">₦0 / month</b>
+        <div class="muted">We will tell you how many units you must sell every month just to pay this bill!</div>
+      </div>
+    </div>
+
+    <!-- FORM FOR STEP 4: BUNDLE CHECKER (ITEM IN COMBO) -->
+    <div id="modalFormBundle" style="display:none">
+      <label>Select from Saved Products:</label>
+      <select id="bSavedSelect" onchange="onBundleSelectProduct()">
+        <option value="">-- Choose from your saved products --</option>
+      </select>
+
+      <span class="chip-label">Or Add Packaging / Bonus Freebie (Tap to fill):</span>
+      <div class="chip-container">
+        <button type="button" class="chip" onclick="applyBundleChip('Hamper Basket / Special Gift Box', 1200, 1)">🎁 Hamper Box (₦1,200)</button>
+        <button type="button" class="chip" onclick="applyBundleChip('Ribbon & Thank-You Card', 250, 1)">🎀 Ribbon &amp; Card (₦250)</button>
+        <button type="button" class="chip" onclick="applyBundleChip('Free Gift / Bonus Sample to Customer', 400, 1)">✨ Customer Freebie (₦400)</button>
+        <button type="button" class="chip" onclick="applyBundleChip('Heavy Branded Carrier Bag', 150, 1)">🛍️ Carrier Bag (₦150)</button>
+      </div>
+
+      <label style="margin-top:10px">What product, packaging, or gift is included?</label>
+      <input id="bAddName" placeholder="e.g. 2kg Oloyin Beans, Hamper wicker basket, Thank-you card, Bonus sample jar">
+
+      <label>True Cost of ONE item (<span class="cSym">₦</span>)</label>
+      <input id="bAddUnitCost" type="text" inputmode="numeric" placeholder="e.g. 2,649 (your cost to produce or buy 1 unit of this item)" oninput="updateBundlePreview()">
+
+      <label>How many of this item are inside the bundle?</label>
+      <input id="bAddQty" type="number" value="1" min="1" placeholder="e.g. 2 (number of units included in the bundle)" oninput="updateBundlePreview()">
+
+      <div class="calc-preview-box">
+        Total cost in bundle: <b id="bAddTotalPreview">₦0</b>
+      </div>
+    </div>
+
+    <button type="button" onclick="confirmStepAdd()" style="margin-top:16px">Add to the calculator</button>
+    <button type="button" onclick="closeStepModal()" class="ghost" style="margin-top:8px">Cancel</button>
+  </div>
+</div>
+
+<script>
+// CURRENT CURRENCY STATE
+var _curr = "NGN";
+var CURR_SYMBOLS = { NGN: "₦", USD: "$", GHS: "GH₵" };
+
+function parseNum(val) {
+  if (typeof val === 'number') return isNaN(val) ? 0 : val;
+  if (!val) return 0;
+  var clean = String(val).replace(/[^0-9.-]/g, '');
+  var num = parseFloat(clean);
+  return isNaN(num) ? 0 : num;
+}
+
+function fmt(n) {
+  var sym = CURR_SYMBOLS[_curr] || "₦";
+  var num = parseNum(n);
+  if (_curr === "NGN") {
+    return sym + Math.round(num).toLocaleString("en-NG");
+  }
+  return sym + num.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function onCurrencyChange() {
+  _curr = document.getElementById("currSelect").value;
+  var syms = document.querySelectorAll(".cSym");
+  for (var i = 0; i < syms.length; i++) {
+    syms[i].innerText = CURR_SYMBOLS[_curr] || "₦";
+  }
+  renderSaved();
+  if (window._last) calcPrice();
+  calcStartup();
+  calcBE();
+  calcBundle();
+}
+
+// STEP NAVIGATION
+var STEP_LABELS = [
+  "1. What should I charge?",
+  "2. How much to start?",
+  "3. When will I get my money back?",
+  "4. Will this offer lose me money?"
+];
+var STEP_IDS = ["price", "startup", "breakeven", "bundle"];
+window._idx = 0;
+
+function renderTabs() {
+  var c = document.getElementById("stepTabs");
+  if (!c) return;
+  var idx = window._idx || 0;
+  var h = "";
+  if (idx === 0) {
+    h += "<button type='button' class='tab-current'>" + STEP_LABELS[0] + "</button>";
+    for (var i = 1; i < STEP_IDS.length; i++) {
+      h += "<button type='button' class='tab-num' onclick='show(\"" + STEP_IDS[i] + "\")'>" + (i + 1) + "</button>";
+    }
+  } else if (idx === 1) {
+    h += "<button type='button' class='tab-num' onclick='show(\"" + STEP_IDS[0] + "\")'>1</button>";
+    h += "<button type='button' class='tab-current'>" + STEP_LABELS[1] + "</button>";
+    for (var j = 2; j < STEP_IDS.length; j++) {
+      h += "<button type='button' class='tab-num' onclick='show(\"" + STEP_IDS[j] + "\")'>" + (j + 1) + "</button>";
+    }
+  } else {
+    h += "<button type='button' class='tab-num' onclick='prevCalc()'>&lt;</button>";
+    h += "<button type='button' class='tab-current'>" + STEP_LABELS[idx] + "</button>";
+    for (var k = idx + 1; k < STEP_IDS.length; k++) {
+      h += "<button type='button' class='tab-num' onclick='show(\"" + STEP_IDS[k] + "\")'>" + (k + 1) + "</button>";
+    }
+  }
+  c.innerHTML = h;
+}
+
+function show(id) {
+  var steps = STEP_IDS;
+  for (var i = 0; i < steps.length; i++) {
+    var el = document.getElementById(steps[i]);
+    if (el) el.style.display = "none";
+  }
+  var active = document.getElementById(id);
+  if (active) active.style.display = "block";
+  var idx = steps.indexOf(id);
+  if (idx >= 0) {
+    window._idx = idx;
+    document.getElementById("phase2Fill").style.width = ((idx + 1) * 25) + "%";
+    document.getElementById("phase2Step").innerText = STEP_LABELS[idx];
+  }
+  renderTabs();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function nextCalc() {
+  var n = Math.min(3, (window._idx || 0) + 1);
+  show(STEP_IDS[n]);
+}
+
+function prevCalc() {
+  var n = Math.max(0, (window._idx || 0) - 1);
+  show(STEP_IDS[n]);
+}
+
+function finishFlow() {
+  var target = document.getElementById("savedCard");
+  if (target) target.scrollIntoView({ behavior: "smooth" });
+}
+
+// -----------------------------------------------------------------------------
+// STEP-AWARE MODAL SYSTEM WITH CONTEXTUAL CHIPS
+// -----------------------------------------------------------------------------
+var _activeModalTarget = "price";
+var _priceCostMode = "direct"; // direct | batch
+var _startupPriority = "essential"; // essential | later
+var _breakevenFreq = "monthly"; // monthly | weekly
+
+var STARTUP_SUGGESTIONS = {
+  foodstuff: [
+    { name: "100kg Digital Bench Scale", cat: "Equipment", cost: 35000, pri: "essential" },
+    { name: "Manual Impulse Bag Sealer", cat: "Equipment", cost: 22000, pri: "essential" },
+    { name: "Wooden Pallets to keep sacks off floor", cat: "Equipment", cost: 18000, pri: "essential" },
+    { name: "Market Stall / Kiosk Space Advance", cat: "Space", cost: 120000, pri: "essential" },
+    { name: "Market Union & Security Registration", cat: "Legal", cost: 15000, pri: "later" }
+  ],
+  baking: [
+    { name: "Cake Turntable & Palette Knife Set", cat: "Equipment", cost: 16000, pri: "essential" },
+    { name: "Oven Thermometer & Timer", cat: "Equipment", cost: 8500, pri: "essential" },
+    { name: "Electric Stand/Hand Mixer 5-Speed", cat: "Equipment", cost: 55000, pri: "essential" },
+    { name: "Glass Countertop Cake Display", cat: "Space", cost: 65000, pri: "later" },
+    { name: "Custom Branded Aprons & Box Ribbons", cat: "Branding", cost: 18000, pri: "later" }
+  ],
+  thrift: [
+    { name: "Handheld Vertical Steam Iron", cat: "Equipment", cost: 32000, pri: "essential" },
+    { name: "Full-Length Standing Mirror", cat: "Equipment", cost: 28000, pri: "essential" },
+    { name: "Wooden Hangers Set (50 pcs)", cat: "Equipment", cost: 18000, pri: "essential" },
+    { name: "Photo Ring Light for Instagram Shoots", cat: "Branding", cost: 22000, pri: "essential" },
+    { name: "Clothing Tag Gun & Price Labels", cat: "Equipment", cost: 8500, pri: "later" }
+  ],
+  skincare: [
+    { name: "Precision Digital Gram Scale (0.01g)", cat: "Equipment", cost: 15000, pri: "essential" },
+    { name: "Stainless Steel Double Boiler Pot", cat: "Equipment", cost: 25000, pri: "essential" },
+    { name: "High-Speed Immersion Hand Blender", cat: "Equipment", cost: 28000, pri: "essential" },
+    { name: "First 100 Amber PET Jars & Droppers", cat: "Stock", cost: 48000, pri: "essential" },
+    { name: "Lab Sanitizer & Safety Gloves Kit", cat: "Equipment", cost: 12000, pri: "essential" }
+  ],
+  catering: [
+    { name: "Commercial 100L Cold Storage Cooler", cat: "Equipment", cost: 45000, pri: "essential" },
+    { name: "Heavy Aluminum Stock Pots (Size 4)", cat: "Equipment", cost: 42000, pri: "essential" },
+    { name: "PET Bottle Cap Crimper / Sealer", cat: "Equipment", cost: 24000, pri: "essential" },
+    { name: "Fine Cloth Filtration Mesh for Zobo", cat: "Equipment", cost: 8000, pri: "essential" },
+    { name: "Plastic Event Delivery Crates (5 pcs)", cat: "Equipment", cost: 25000, pri: "later" }
+  ]
+};
+
+function onProductNameChange() {
+  // Can be extended for dynamic product-level heuristics
+}
+
+function openStepModal(target) {
+  _activeModalTarget = target;
+  var m = document.getElementById("stepModal");
+  if (!m) return;
+
+  // Hide all fieldsets
+  document.getElementById("modalFormPrice").style.display = "none";
+  document.getElementById("modalFormStartup").style.display = "none";
+  document.getElementById("modalFormBreakeven").style.display = "none";
+  document.getElementById("modalFormBundle").style.display = "none";
+
+  if (target === "price") {
+    document.getElementById("modalTitle").innerText = "Add Another Cost — For ONE Unit";
+    document.getElementById("modalSubtitle").innerText = "Include extra unit expenses (park dispatch, gate ticket, sealer fuel) so you don't price blind.";
+    document.getElementById("pAddName").value = "";
+    document.getElementById("pAddUnitAmount").value = "";
+    document.getElementById("pAddBatchTotal").value = "";
+    document.getElementById("pAddBatchCount").value = "";
+    setPriceCostMode("direct");
+    document.getElementById("modalFormPrice").style.display = "block";
+  } else if (target === "startup") {
+    var curTmpl = document.getElementById("tmpl") ? document.getElementById("tmpl").value : "foodstuff";
+    document.getElementById("modalTitle").innerText = "Add Startup Capital Need";
+    document.getElementById("modalSubtitle").innerText = "One-time equipment, shop advance, permits or tools needed before opening.";
+    renderStartupChips(curTmpl);
+    document.getElementById("sAddName").value = "";
+    document.getElementById("sAddAmount").value = "";
+    setStartupPriority("essential");
+    document.getElementById("modalFormStartup").style.display = "block";
+  } else if (target === "breakeven") {
+    document.getElementById("modalTitle").innerText = "Add Ongoing Monthly Running Bill";
+    document.getElementById("modalSubtitle").innerText = "Recurring bills you must pay every month regardless of sales volume.";
+    document.getElementById("beAddName").value = "";
+    document.getElementById("beAddAmount").value = "";
+    setBreakevenFreq("monthly");
+    document.getElementById("modalFormBreakeven").style.display = "block";
+  } else if (target === "bundle") {
+    document.getElementById("modalTitle").innerText = "Add Item, Packaging or Freebie to Bundle";
+    document.getElementById("modalSubtitle").innerText = "Account for all products, hamper baskets/boxes, ribbons, and customer freebies.";
+    populateBundleSavedDropdown();
+    document.getElementById("bAddName").value = "";
+    document.getElementById("bAddUnitCost").value = "";
+    document.getElementById("bAddQty").value = "1";
+    updateBundlePreview();
+    document.getElementById("modalFormBundle").style.display = "block";
+  }
+
+  m.classList.add("open");
+}
+
+function closeStepModal() {
+  var m = document.getElementById("stepModal");
+  if (m) m.classList.remove("open");
+}
+
+// STEP 1 CHIP ACTIONS
+function applyPriceChip(name, mode, val1, val2) {
+  document.getElementById("pAddName").value = name;
+  if (mode === "batch") {
+    setPriceCostMode("batch");
+    document.getElementById("pAddBatchTotal").value = val1.toLocaleString();
+    document.getElementById("pAddBatchCount").value = val2;
+    updateBatchPreview();
+  } else {
+    setPriceCostMode("direct");
+    document.getElementById("pAddUnitAmount").value = val1.toLocaleString();
+  }
+}
+
+function setPriceCostMode(mode) {
+  _priceCostMode = mode;
+  var bDirect = document.getElementById("pModeDirect");
+  var bBatch = document.getElementById("pModeBatch");
+  var fDirect = document.getElementById("pDirectFields");
+  var fBatch = document.getElementById("pBatchFields");
+
+  if (mode === "direct") {
+    bDirect.classList.add("active");
+    bBatch.classList.remove("active");
+    fDirect.style.display = "block";
+    fBatch.style.display = "none";
+  } else {
+    bDirect.classList.remove("active");
+    bBatch.classList.add("active");
+    fDirect.style.display = "none";
+    fBatch.style.display = "block";
+    updateBatchPreview();
+  }
+}
+
+function updateBatchPreview() {
+  var total = parseNum(document.getElementById("pAddBatchTotal").value);
+  var count = Math.max(1, parseNum(document.getElementById("pAddBatchCount").value));
+  var perUnit = count > 0 ? (total / count) : 0;
+  document.getElementById("pBatchCalcPreview").innerText = fmt(perUnit);
+}
+
+// STEP 2 CHIP ACTIONS
+function renderStartupChips(tmplKey) {
+  var container = document.getElementById("sChipContainer");
+  if (!container) return;
+  var list = STARTUP_SUGGESTIONS[tmplKey] || STARTUP_SUGGESTIONS.foodstuff;
+  container.innerHTML = list.map(function(item, idx) {
+    return "<button type='button' class='chip' onclick='applyStartupChip(" + JSON.stringify(item.name) + ", " + JSON.stringify(item.cat) + ", " + item.cost + ", " + JSON.stringify(item.pri) + ")'>" + item.name + " (" + fmt(item.cost) + ")</button>";
+  }).join("");
+}
+
+function applyStartupChip(name, cat, cost, pri) {
+  document.getElementById("sAddName").value = name;
+  document.getElementById("sAddCategory").value = cat;
+  document.getElementById("sAddAmount").value = cost.toLocaleString();
+  setStartupPriority(pri);
+}
+
+function setStartupPriority(pri) {
+  _startupPriority = pri;
+  var bEss = document.getElementById("sPriEssential");
+  var bLat = document.getElementById("sPriLater");
+  var hint = document.getElementById("sPriHint");
+
+  if (pri === "essential") {
+    bEss.classList.add("active");
+    bLat.classList.remove("active");
+    hint.innerText = "Tick-marked for Day 1 launch (Lean Start budget).";
+  } else {
+    bEss.classList.remove("active");
+    bLat.classList.add("active");
+    hint.innerText = "Unchecked initially. Can wait until business makes profit (Proper Start).";
+  }
+}
+
+// STEP 3 CHIP ACTIONS
+function applyBreakevenChip(name, amount, freq) {
+  document.getElementById("beAddName").value = name;
+  document.getElementById("beAddAmount").value = amount.toLocaleString();
+  setBreakevenFreq(freq);
+}
+
+function setBreakevenFreq(freq) {
+  _breakevenFreq = freq;
+  var bM = document.getElementById("beFreqMonthly");
+  var bW = document.getElementById("beFreqWeekly");
+  var lbl = document.getElementById("beAmountLabel");
+
+  if (freq === "monthly") {
+    bM.classList.add("active");
+    bW.classList.remove("active");
+    lbl.innerHTML = "Amount (<span class='cSym'>" + (CURR_SYMBOLS[_curr] || "₦") + "</span> per month)";
+  } else {
+    bM.classList.remove("active");
+    bW.classList.add("active");
+    lbl.innerHTML = "Amount (<span class='cSym'>" + (CURR_SYMBOLS[_curr] || "₦") + "</span> per week)";
+  }
+  updateBreakevenPreview();
+}
+
+function updateBreakevenPreview() {
+  var amt = parseNum(document.getElementById("beAddAmount").value);
+  var monthlyAmt = (_breakevenFreq === "weekly") ? (amt * 4) : amt;
+  document.getElementById("beMonthlyPreview").innerText = fmt(monthlyAmt) + " / month";
+}
+
+// STEP 4 CHIP ACTIONS
+function populateBundleSavedDropdown() {
+  var sel = document.getElementById("bSavedSelect");
+  if (!sel) return;
+  sel.innerHTML = "<option value=''>-- Choose from your saved products --</option>";
+  var a = [];
+  try { a = JSON.parse(localStorage.getItem("startwella:products:v1") || "[]"); } catch (e) { a = []; }
+  for (var i = 0; i < a.length; i++) {
+    var opt = document.createElement("option");
+    opt.value = i;
+    opt.textContent = a[i].name + " (True Cost: " + fmt(a[i].tc) + ")";
+    sel.appendChild(opt);
+  }
+}
+
+function onBundleSelectProduct() {
+  var sel = document.getElementById("bSavedSelect");
+  var idx = sel.value;
+  if (idx === "") return;
+  var a = JSON.parse(localStorage.getItem("startwella:products:v1") || "[]");
+  var prod = a[idx];
+  if (prod) {
+    document.getElementById("bAddName").value = prod.name;
+    document.getElementById("bAddUnitCost").value = Math.round(prod.tc).toLocaleString();
+    updateBundlePreview();
+  }
+}
+
+function applyBundleChip(name, cost, qty) {
+  document.getElementById("bAddName").value = name;
+  document.getElementById("bAddUnitCost").value = cost.toLocaleString();
+  document.getElementById("bAddQty").value = qty;
+  updateBundlePreview();
+}
+
+function updateBundlePreview() {
+  var cost = parseNum(document.getElementById("bAddUnitCost").value);
+  var qty = Math.max(1, parseNum(document.getElementById("bAddQty").value));
+  var lineTotal = cost * qty;
+  document.getElementById("bAddTotalPreview").innerText = fmt(lineTotal);
+}
+
+// CONFIRM ADD FOR ALL STEPS
+function confirmStepAdd() {
+  if (_activeModalTarget === "price") {
+    var name = document.getElementById("pAddName").value.trim();
+    if (!name) { alert("Please type what this unit cost is called (e.g. Park errand boy, nylon tie)."); return; }
+    
+    var unitCost = 0;
+    var badgeText = "";
+    if (_priceCostMode === "direct") {
+      unitCost = parseNum(document.getElementById("pAddUnitAmount").value);
+      if (unitCost <= 0) { alert("Please enter the amount for one unit."); return; }
+      badgeText = "Unit cost";
+    } else {
+      var batchTotal = parseNum(document.getElementById("pAddBatchTotal").value);
+      var batchCount = Math.max(1, parseNum(document.getElementById("pAddBatchCount").value));
+      if (batchTotal <= 0) { alert("Please enter total amount spent for the batch."); return; }
+      unitCost = Math.round((batchTotal / batchCount) * 100) / 100;
+      badgeText = "Batch: " + fmt(batchTotal) + " ÷ " + batchCount;
+    }
+
+    var row = document.createElement("div");
+    row.className = "custom-row";
+
+    var lbl = document.createElement("label");
+    lbl.textContent = name + " ";
+    var badge = document.createElement("span");
+    badge.className = "badge";
+    badge.textContent = badgeText;
+    lbl.appendChild(badge);
+
+    var inp = document.createElement("input");
+    inp.type = "text";
+    inp.inputMode = "numeric";
+    inp.className = "pCost";
+    inp.value = unitCost.toLocaleString();
+    inp.oninput = function() { calcPrice(); };
+
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "remove-x";
+    btn.textContent = "×";
+    btn.onclick = function() { row.remove(); calcPrice(); };
+
+    row.appendChild(lbl);
+    row.appendChild(inp);
+    row.appendChild(btn);
+
+    document.getElementById("pCustom").appendChild(row);
+    closeStepModal();
+    calcPrice();
+
+  } else if (_activeModalTarget === "startup") {
+    var sName = document.getElementById("sAddName").value.trim();
+    var sCat = document.getElementById("sAddCategory").value;
+    var sAmt = parseNum(document.getElementById("sAddAmount").value);
+    if (!sName) { alert("Please type the startup item name (e.g. 100kg digital bench scale)."); return; }
+    if (sAmt <= 0) { alert("Please enter the estimated cost."); return; }
+
+    var isChecked = (_startupPriority === "essential");
+    var sRow = document.createElement("div");
+    sRow.className = "custom-row";
+
+    var sLbl = document.createElement("label");
+    var cb = document.createElement("input");
+    cb.type = "checkbox";
+    cb.className = "sCheck";
+    cb.checked = isChecked;
+    cb.style.width = "18px";
+    cb.style.height = "18px";
+    cb.style.marginRight = "8px";
+    cb.style.verticalAlign = "middle";
+    cb.onchange = function() { calcStartup(); };
+
+    sLbl.appendChild(cb);
+    sLbl.appendChild(document.createTextNode(sName + " "));
+
+    var cBadge = document.createElement("span");
+    cBadge.className = "badge badge-blue";
+    cBadge.textContent = sCat;
+    sLbl.appendChild(cBadge);
+
+    if (isChecked) {
+      var pBadge = document.createElement("span");
+      pBadge.className = "badge";
+      pBadge.textContent = "Day 1 Lean";
+      sLbl.appendChild(pBadge);
+    }
+
+    var sInp = document.createElement("input");
+    sInp.type = "text";
+    sInp.inputMode = "numeric";
+    sInp.className = "sCost";
+    sInp.value = sAmt.toLocaleString();
+    sInp.oninput = function() { calcStartup(); };
+
+    var sBtn = document.createElement("button");
+    sBtn.type = "button";
+    sBtn.className = "remove-x";
+    sBtn.textContent = "×";
+    sBtn.onclick = function() { sRow.remove(); calcStartup(); };
+
+    sRow.appendChild(sLbl);
+    sRow.appendChild(sInp);
+    sRow.appendChild(sBtn);
+
+    document.getElementById("sCustom").appendChild(sRow);
+    closeStepModal();
+    calcStartup();
+
+  } else if (_activeModalTarget === "breakeven") {
+    var beName = document.getElementById("beAddName").value.trim();
+    var rawAmt = parseNum(document.getElementById("beAddAmount").value);
+    if (!beName) { alert("Please name this ongoing bill (e.g. Stall rent, generator fuel)."); return; }
+    if (rawAmt <= 0) { alert("Please enter the amount."); return; }
+
+    var beAmt = (_breakevenFreq === "weekly") ? (rawAmt * 4) : rawAmt;
+    var freqNote = (_breakevenFreq === "weekly") ? (fmt(rawAmt) + "/wk × 4 = " + fmt(beAmt) + "/mo") : (fmt(beAmt) + "/mo");
+
+    var beRow = document.createElement("div");
+    beRow.className = "custom-row";
+
+    var beLbl = document.createElement("label");
+    beLbl.textContent = beName + " ";
+    var beBadge = document.createElement("span");
+    beBadge.className = "badge badge-warn";
+    beBadge.textContent = freqNote;
+    beLbl.appendChild(beBadge);
+
+    var beInp = document.createElement("input");
+    beInp.type = "text";
+    beInp.inputMode = "numeric";
+    beInp.className = "beOverheadCost";
+    beInp.value = beAmt.toLocaleString();
+    beInp.oninput = function() { calcBE(); };
+
+    var beBtn = document.createElement("button");
+    beBtn.type = "button";
+    beBtn.className = "remove-x";
+    beBtn.textContent = "×";
+    beBtn.onclick = function() { beRow.remove(); calcBE(); };
+
+    beRow.appendChild(beLbl);
+    beRow.appendChild(beInp);
+    beRow.appendChild(beBtn);
+
+    document.getElementById("beMonthly").appendChild(beRow);
+    closeStepModal();
+    calcBE();
+
+  } else if (_activeModalTarget === "bundle") {
+    var bName = document.getElementById("bAddName").value.trim();
+    var bUnitCost = parseNum(document.getElementById("bAddUnitCost").value);
+    var bQty = Math.max(1, parseNum(document.getElementById("bAddQty").value));
+    if (!bName) { alert("Please specify the item name (e.g. 2kg Rice, Hamper basket)."); return; }
+    if (bUnitCost <= 0) { alert("Please enter the unit true cost."); return; }
+
+    var bRow = document.createElement("div");
+    bRow.className = "custom-row";
+    bRow.setAttribute("data-name", bName);
+
+    var bLbl = document.createElement("label");
+    bLbl.textContent = bName;
+
+    var grid = document.createElement("div");
+    grid.className = "bundle-grid";
+
+    var qDiv = document.createElement("div");
+    var qInp = document.createElement("input");
+    qInp.type = "number";
+    qInp.className = "bQty";
+    qInp.value = bQty;
+    qInp.min = "1";
+    qInp.oninput = function() { updateBundleLine(this); };
+    qDiv.appendChild(qInp);
+
+    var cDiv = document.createElement("div");
+    var cInp = document.createElement("input");
+    cInp.type = "text";
+    cInp.inputMode = "numeric";
+    cInp.className = "bCost";
+    cInp.value = bUnitCost.toLocaleString();
+    cInp.oninput = function() { updateBundleLine(this); };
+    cDiv.appendChild(cInp);
+
+    var tDiv = document.createElement("div");
+    tDiv.className = "bundle-subtotal";
+    tDiv.innerHTML = "= <span class='bLineTotal'>" + fmt(bUnitCost * bQty) + "</span>";
+
+    grid.appendChild(qDiv);
+    grid.appendChild(cDiv);
+    grid.appendChild(tDiv);
+
+    var bBtn = document.createElement("button");
+    bBtn.type = "button";
+    bBtn.className = "remove-x";
+    bBtn.textContent = "×";
+    bBtn.onclick = function() { bRow.remove(); calcBundle(); };
+
+    bRow.appendChild(bLbl);
+    bRow.appendChild(grid);
+    bRow.appendChild(bBtn);
+
+    document.getElementById("bItems").appendChild(bRow);
+    closeStepModal();
+    calcBundle();
+  }
+}
+
+function updateBundleLine(inputEl) {
+  var row = inputEl.closest(".custom-row");
+  if (!row) return;
+  var qty = Math.max(1, parseNum(row.querySelector(".bQty").value));
+  var cost = parseNum(row.querySelector(".bCost").value);
+  var lineTotalEl = row.querySelector(".bLineTotal");
+  if (lineTotalEl) lineTotalEl.innerText = fmt(qty * cost);
+  calcBundle();
+}
+
+// -----------------------------------------------------------------------------
+// 1. PRICE CALCULATOR LOGIC
+// -----------------------------------------------------------------------------
+function calcPrice() {
+  var b = parseNum(document.getElementById("bulk").value);
+  var t = parseNum(document.getElementById("trans").value);
+  var pk = parseNum(document.getElementById("pack").value);
+  var l = parseNum(document.getElementById("lab").value);
+  var w = Math.min(Math.max(parseNum(document.getElementById("waste").value), 0), 95);
+
+  var custom = 0;
+  var lines = [];
+  var rows = document.querySelectorAll("#pCustom > div");
+  for (var i = 0; i < rows.length; i++) {
+    var lblText = rows[i].querySelector("label") ? rows[i].querySelector("label").textContent : "Other";
+    var amt = parseNum(rows[i].querySelector(".pCost").value);
+    custom += amt;
+    if (amt > 0) lines.push(lblText.trim() + " (" + fmt(amt) + ")");
+  }
+
+  var spent = b + t + pk + l + custom;
+  var denom = 1 - (w / 100);
+  var tc = denom > 0 ? (spent / denom) : spent;
+
+  var profPct = parseNum(document.getElementById("profit").value);
+  var rec = tc * (1 + profPct / 100);
+  var sell = parseNum(document.getElementById("sell").value);
+  var prof = sell - tc;
+
+  var banner = prof < 0
+    ? "<div class='loss-banner'>LOSS — Your price " + fmt(sell) + " is BELOW your true cost " + fmt(tc) + ". You lose " + fmt(Math.abs(prof)) + " on every sale. Raise price to at least " + fmt(tc) + ".</div>"
+    : "<div class='safe-banner'>SAFE — Your price " + fmt(sell) + " is above your true cost. You keep " + fmt(prof) + " per unit.</div>";
+
+  document.getElementById("priceOut").innerHTML =
+    "<div class='result-card'>" +
+      "<h3>Recommended: Charge " + fmt(rec) + " per unit</h3>" +
+      "<p>You spent <b>" + fmt(spent) + "</b> in direct costs" + (lines.length ? " (" + lines.join(", ") + ")" : "") + ". " +
+      (w > 0 ? w + "% was lost in sorting/waste, making your " : "") +
+      "<b>true cost " + fmt(tc) + "</b>.</p>" +
+      "<p class='muted'>Tiers — Lowest (10%): " + fmt(tc * 1.10) + " | Normal (25%): " + fmt(tc * 1.25) + " | Premium (40%): " + fmt(tc * 1.40) + "</p>" +
+    "</div>" + banner +
+    "<div class='next-action'><b>Next Step:</b> Go to Calculator 2 to see the total startup cash needed to launch at " + fmt(rec) + ".</div>";
+
+  window._last = {
+    name: document.getElementById("pname").value || "Product",
+    tc: tc,
+    rec: rec,
+    sell: sell,
+    prof: prof,
+    spent: spent,
+    waste: w
+  };
+
+  // Pre-fill next calculators with current findings
+  var beProf = document.getElementById("beProfit");
+  if (beProf && prof > 0) beProf.value = Math.round(prof);
+
+  var dCost = document.getElementById("dCost");
+  if (dCost) dCost.value = Math.round(tc).toLocaleString();
+  var dSell = document.getElementById("dSell");
+  if (dSell) dSell.value = Math.round(sell).toLocaleString();
+
+  calcBundle();
+}
+
+function shareWA() {
+  if (!window._last) calcPrice();
+  var l = window._last;
+  var text = "StartWella — Price Card: " + l.name + "\n" +
+             "• True cost: " + fmt(l.tc) + "\n" +
+             "• Recommended: " + fmt(l.rec) + "\n" +
+             "• My price: " + fmt(l.sell) + "\n" +
+             "• Profit per unit: " + fmt(l.prof) + "\n\n" +
+             "Start well. Price right. Grow steady.";
+  window.open("https://wa.me/?text=" + encodeURIComponent(text), "_blank");
+}
+
+function saveProduct() {
+  if (!window._last) calcPrice();
+  var l = window._last;
+  var a = [];
+  try {
+    a = JSON.parse(localStorage.getItem("startwella:products:v1") || "[]");
+  } catch (e) { a = []; }
+
+  a.push({
+    id: "prod_" + Date.now(),
+    name: l.name,
+    tc: l.tc,
+    rec: l.rec,
+    sell: l.sell,
+    prof: l.prof,
+    date: new Date().toLocaleDateString()
+  });
+
+  localStorage.setItem("startwella:products:v1", JSON.stringify(a));
+  renderSaved();
+  alert("Saved '" + l.name + "' to device catalog.");
+}
+
+function renderSaved() {
+  var el = document.getElementById("saved");
+  if (!el) return;
+  var a = [];
+  try {
+    a = JSON.parse(localStorage.getItem("startwella:products:v1") || "[]");
+  } catch (e) { a = []; }
+
+  if (!a.length) {
+    el.innerHTML = "<div class='muted'>No saved products yet. Calculate a price and tap 'Save product'.</div>";
+    return;
+  }
+
+  el.innerHTML = a.map(function(x, i) {
+    return "<div class='saved-row'>" +
+      "<div class='meta'>" +
+        "<b>" + x.name + "</b>" +
+        "<div class='muted'>True: " + fmt(x.tc) + " • Rec: " + fmt(x.rec) + " • Profit: " + fmt(x.prof) + "</div>" +
+      "</div>" +
+      "<button type='button' class='load' onclick='loadSaved(" + i + ")'>Load</button>" +
+      "<button type='button' class='wa' onclick='shareSaved(" + i + ")'>Share</button>" +
+      "<button type='button' class='del' onclick='deleteSaved(" + i + ")'>×</button>" +
+    "</div>";
+  }).join("");
+}
+
+function loadSaved(i) {
+  var a = JSON.parse(localStorage.getItem("startwella:products:v1") || "[]");
+  var x = a[i];
+  if (!x) return;
+  document.getElementById("pname").value = x.name;
+  document.getElementById("sell").value = Math.round(x.rec);
+  show("price");
+  calcPrice();
+}
+
+function shareSaved(i) {
+  var a = JSON.parse(localStorage.getItem("startwella:products:v1") || "[]");
+  var x = a[i];
+  if (!x) return;
+  var text = "StartWella Price Card: " + x.name + "\n" +
+             "• Price: " + fmt(x.sell || x.rec) + "\n" +
+             "• True Cost: " + fmt(x.tc) + "\n" +
+             "• Profit: " + fmt(x.prof) + " per unit";
+  window.open("https://wa.me/?text=" + encodeURIComponent(text), "_blank");
+}
+
+function deleteSaved(i) {
+  var a = JSON.parse(localStorage.getItem("startwella:products:v1") || "[]");
+  if (!confirm("Delete " + (a[i] ? a[i].name : "this item") + "?")) return;
+  a.splice(i, 1);
+  localStorage.setItem("startwella:products:v1", JSON.stringify(a));
+  renderSaved();
+}
+
+function shareFullPriceList() {
+  var a = JSON.parse(localStorage.getItem("startwella:products:v1") || "[]");
+  if (!a.length) { alert("Save at least one product first."); return; }
+  var lines = ["📋 *OFFICIAL PRICE LIST*", "----------------------------------"];
+  for (var i = 0; i < a.length; i++) {
+    lines.push((i + 1) + ". " + a[i].name + " — " + fmt(a[i].sell || a[i].rec));
+  }
+  lines.push("----------------------------------");
+  lines.push("Reply to this message to order!");
+  window.open("https://wa.me/?text=" + encodeURIComponent(lines.join("\n")), "_blank");
+}
+
+function exportPDF() {
+  window.print();
+}
+
+// -----------------------------------------------------------------------------
+// 2. STARTUP COST TEMPLATES & LOGIC
+// -----------------------------------------------------------------------------
+var TEMPLATES = {
+  foodstuff: [
+    ["First stock — 2 bags of rice/beans/pepper", "Initial wholesale goods to sell first", 160000],
+    ["Transport — logistics from wholesale market", "Bus, bike or truck dispatch to shop/house", 12000],
+    ["Packaging — first batch of 200 bags/pouches", "Thick nylon bags, seals, printed brand stickers", 36000],
+    ["Destoning, cleaning & sorting labour", "Helpers or your own preparation time", 15000],
+    ["Storage buckets & digital bench scale", "Tools to keep stock clean, dry and rat-proof", 25000]
+  ],
+  baking: [
+    ["First baking ingredients run", "Flour, butter, sugar, eggs, flavor for 20 orders", 95000],
+    ["Cake packaging starter bundle", "20 luxury boxes, gold cake boards, ribbons", 35000],
+    ["Baking tools & 5-speed hand mixer", "Round pans, spatulas, nozzles, mixing bowls", 55000],
+    ["Gas cylinder refill / Electricity share", "Power for first 20 cake batches", 15000]
+  ],
+  skincare: [
+    ["Base raw materials & essential oils", "10kg unrefined shea butter, almond oil, oils", 65000],
+    ["First 100 amber PET jars & waterproof labels", "Jars, inner lids, tamper seals", 48000],
+    ["High-speed immersion hand blender", "Whisks and stainless steel mixing bowls", 28000],
+    ["Sanitation & measuring gear", "Digital scale 0.01g, cylinders, alcohol spray", 15000]
+  ],
+  thrift: [
+    ["First Grade-A mixed clothing bale", "One bale of selected dresses/jeans", 140000],
+    ["Logistics & market dispatch runner", "Transport from Katangua / Yaba wholesale market", 15000],
+    ["Heavy steam iron & wooden hangers", "Garment care tools to make clothes look brand new", 35000],
+    ["Delivery packaging & branded stickers", "Small ziplock bags & thank-you stickers", 20000]
+  ],
+  catering: [
+    ["Heavy aluminum stock pots & ladles", "Size 4 cooking pots, commercial spoons", 55000],
+    ["First bulk ingredients & drinks run", "Wholesale foodstuff for your first catering gig", 80000],
+    ["Serving plates & disposable foils", "First event supplies (foil bowls, plastic forks)", 30000],
+    ["Venue delivery & logistics share", "Van/cab dispatch to carry food to client", 20000]
+  ]
+};
+
+function loadTmpl() {
+  var key = document.getElementById("tmpl").value;
+  var list = TEMPLATES[key] || TEMPLATES.foodstuff;
+  var h = "";
+  for (var i = 0; i < list.length; i++) {
+    h += "<div class='custom-row' style='background:#fff'>" +
+      "<label><input type='checkbox' checked class='sCheck' onchange='calcStartup()' style='width:18px;height:18px;margin-right:8px;vertical-align:middle'> " + list[i][0] + "</label>" +
+      "<div class='muted'>" + list[i][1] + "</div>" +
+      "<input type='text' inputmode='numeric' class='sCost' value='" + list[i][2].toLocaleString() + "' style='margin-top:6px' oninput='calcStartup()'>" +
+    "</div>";
+  }
+  document.getElementById("sItems").innerHTML = h;
+  calcStartup();
+}
+
+function calcStartup() {
+  var total = 0;
+  var allItemsTotal = 0;
+  var rows = document.querySelectorAll("#sItems > div, #sCustom > div");
+  var lines = [];
+
+  for (var i = 0; i < rows.length; i++) {
+    var cb = rows[i].querySelector("input[type=checkbox]");
+    var amt = parseNum(rows[i].querySelector(".sCost").value);
+    allItemsTotal += amt;
+    var labelEl = rows[i].querySelector("label");
+    var labelText = labelEl ? labelEl.textContent : "Item";
+
+    if (cb && cb.checked) {
+      total += amt;
+      lines.push(labelText.trim() + " (" + fmt(amt) + ")");
+    }
+  }
+
+  var pct = parseNum(document.getElementById("sCont").value);
+  var cont = Math.round(total * pct / 100);
+  var grand = total + cont;
+
+  document.getElementById("startupOut").innerHTML =
+    "<div class='result-card'>" +
+      "<h3>You need " + fmt(grand) + " to start</h3>" +
+      "<p>Checked items: <b>" + fmt(total) + "</b>. Extra for surprises (" + pct + "%): <b>" + fmt(cont) + "</b>.</p>" +
+      "<p class='muted'>Lean Day 1 budget: " + fmt(grand) + " | Full wish-list budget: " + fmt(allItemsTotal * (1 + pct / 100)) + "</p>" +
+    "</div>" +
+    "<div class='next-action'><b>Next Step:</b> Go to Calculator 3 to see how many units you must sell to recover this " + fmt(grand) + ".</div>";
+
+  // Pre-fill Break-Even startup input
+  var beStart = document.getElementById("beStart");
+  if (beStart) beStart.value = grand.toLocaleString();
+}
+
+// -----------------------------------------------------------------------------
+// 3. BREAK-EVEN LOGIC (STARTUP + MONTHLY OVERHEAD)
+// -----------------------------------------------------------------------------
+function calcBE() {
+  var start = parseNum(document.getElementById("beStart").value);
+  var prof = parseNum(document.getElementById("beProfit").value);
+  var perWeek = Math.max(1, parseNum(document.getElementById("beWeek").value));
+
+  // Sum monthly ongoing running costs
+  var monthlyOverhead = 0;
+  var overheadRows = document.querySelectorAll("#beMonthly .beOverheadCost");
+  for (var i = 0; i < overheadRows.length; i++) {
+    monthlyOverhead += parseNum(overheadRows[i].value);
+  }
+
+  if (prof <= 0) {
+    document.getElementById("beOut").innerHTML =
+      "<div class='loss-banner'>You keep " + fmt(prof) + " from each sale. You will never recover your starting money or pay your bills. Raise your price in Calculator 1 first.</div>";
+    return;
+  }
+
+  var units = Math.ceil(start / prof);
+  var weeks = Math.ceil(units / perWeek);
+  var monthlyUnits = monthlyOverhead > 0 ? Math.ceil(monthlyOverhead / prof) : 0;
+
+  var monthlyNotice = monthlyOverhead > 0
+    ? "<p style='margin-top:10px;border-top:1px dashed #BFE8CD;padding-top:10px'><b>Monthly Overhead:</b> You have " + fmt(monthlyOverhead) + "/mo in ongoing bills.<br>" +
+      "You must sell <b>" + monthlyUnits + " units EVERY MONTH</b> just to keep your shop open before making personal profit!</p>"
+    : "";
+
+  document.getElementById("beOut").innerHTML =
+    "<div class='result-card'>" +
+      "<h3>Sell " + units + " units in about " + weeks + " weeks</h3>" +
+      "<p>Starting capital: <b>" + fmt(start) + "</b>. Profit per sale: <b>" + fmt(prof) + "</b>.<br>" +
+      fmt(start) + " ÷ " + fmt(prof) + " = <b>" + units + " sales</b> needed to break even.</p>" +
+      monthlyNotice +
+    "</div>" +
+    "<div class='next-action'><b>Next Step:</b> If " + weeks + " weeks is too long, raise your price slightly or start with a leaner budget in Calculator 2.</div>";
+}
+
+// -----------------------------------------------------------------------------
+// 4. BUNDLE & DISCOUNT LOGIC (WITH DANGER ZONE TABLE)
+// -----------------------------------------------------------------------------
+function calcBundle() {
+  var bp = parseNum(document.getElementById("bPrice").value);
+  var sum = 0;
+  var rows = document.querySelectorAll("#bItems .custom-row");
+
+  for (var i = 0; i < rows.length; i++) {
+    var qty = Math.max(1, parseNum(rows[i].querySelector(".bQty") ? rows[i].querySelector(".bQty").value : 1));
+    var cost = parseNum(rows[i].querySelector(".bCost") ? rows[i].querySelector(".bCost").value : 0);
+    var lineTotal = qty * cost;
+    sum += lineTotal;
+    var ltSpan = rows[i].querySelector(".bLineTotal");
+    if (ltSpan) ltSpan.innerText = fmt(lineTotal);
+  }
+
+  var bundleProf = bp - sum;
+
+  var dSell = parseNum(document.getElementById("dSell").value);
+  var dCost = parseNum(document.getElementById("dCost").value);
+  var dPct = parseNum(document.getElementById("dPct").value);
+
+  if (dPct >= 100) {
+    document.getElementById("bundleOut").innerHTML =
+      "<div class='loss-banner'>A 100% discount means free. You will lose everything. Use a smaller discount (e.g. 10%).</div>";
+    renderDangerZoneTable(dSell, dCost);
+    return;
+  }
+
+  var dPrice = dSell * (1 - dPct / 100);
+  var dProf = dPrice - dCost;
+
+  var bBanner = bundleProf < 0
+    ? "<div class='loss-banner'>BUNDLE LOSS — This combo loses " + fmt(Math.abs(bundleProf)) + ". Total items cost " + fmt(sum) + ". Raise bundle price to at least " + fmt(sum) + "!</div>"
+    : "<div class='safe-banner'>BUNDLE SAFE — This combo keeps " + fmt(bundleProf) + " in profit. (Total cost: " + fmt(sum) + ").</div>";
+
+  var dBanner = dProf < 0
+    ? "<div class='loss-banner'>DISCOUNT LOSS — After " + dPct + "% off (" + fmt(dPrice) + "), you lose " + fmt(Math.abs(dProf)) + " per unit below cost (" + fmt(dCost) + "). Lower discount!</div>"
+    : "<div class='safe-banner'>DISCOUNT SAFE — After " + dPct + "% off (" + fmt(dPrice) + "), you still keep " + fmt(dProf) + " profit per unit.</div>";
+
+  document.getElementById("bundleOut").innerHTML =
+    "<div class='result-card'>" +
+      "<h3>Bundle: Charge " + fmt(bp) + " (Items Cost: " + fmt(sum) + ")</h3>" +
+      "<p>Discount: Charge " + fmt(dPrice) + " after " + dPct + "% off (Cost: " + fmt(dCost) + ").</p>" +
+    "</div>" + bBanner + dBanner;
+
+  renderDangerZoneTable(dSell, dCost);
+}
+
+function renderDangerZoneTable(price, cost) {
+  var el = document.getElementById("dangerZoneTable");
+  if (!el || price <= 0 || cost <= 0) return;
+
+  var tiers = [5, 10, 15, 20, 25, 30];
+  var rows = tiers.map(function(pct) {
+    var discPrice = price * (1 - pct / 100);
+    var profit = discPrice - cost;
+    var isSafe = profit >= 0;
+    var statusClass = isSafe ? "dz-safe" : "dz-loss";
+    var statusText = isSafe ? ("SAFE (+" + fmt(profit) + ")") : ("LOSS (" + fmt(profit) + ")");
+    return "<tr>" +
+      "<td><b>" + pct + "% off</b></td>" +
+      "<td>" + fmt(discPrice) + "</td>" +
+      "<td class='" + statusClass + "'>" + statusText + "</td>" +
+    "</tr>";
+  });
+
+  el.innerHTML = "<table class='dz-table'>" +
+    "<thead><tr><th>Discount %</th><th>New Selling Price</th><th>Profit / Loss Outcome</th></tr></thead>" +
+    "<tbody>" + rows.join("") + "</tbody>" +
+  "</table>";
+}
+
+// FORCE FULL APP REFRESH & CACHE EVACUATION
+function forceAppRefresh() {
+  if (confirm("Refresh StartWella to the latest version? (This clears outdated browser cache)")) {
+    if ('caches' in window) {
+      caches.keys().then(function(names) {
+        return Promise.all(names.map(function(n) { return caches.delete(n); }));
+      }).then(function() {
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then(function(regs) {
+            for (var i = 0; i < regs.length; i++) regs[i].unregister();
+            window.location.reload(true);
+          });
+        } else {
+          window.location.reload(true);
+        }
+      });
+    } else {
+      window.location.reload(true);
+    }
+  }
+}
+
+// REGISTER SERVICE WORKER WITH AUTOMATIC UPDATE CHECK
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('sw.js?v=1.0.3-20261121').then(function(reg) {
+      reg.update(); // Force check for updated sw.js immediately
+    }).catch(function(err) {
+      console.log('SW registration note:', err);
+    });
+  });
+}
+
+// INITIALIZATION
+loadTmpl();
+renderSaved();
+window._idx = 0;
+renderTabs();
+</script>
 </body>
 </html>
