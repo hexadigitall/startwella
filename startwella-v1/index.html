@@ -74,6 +74,19 @@
     .saved-row .load { background: #EAF6F1 !important; color: #0F2A44 !important; }
     .saved-row .wa { background: #25D366 !important; }
 
+    /* SUGGESTION CHIPS */
+    .chip-label { font-size: 12px; font-weight: 700; color: #5A6B7C; margin-top: 10px; text-transform: uppercase; letter-spacing: 0.5px; display: block; }
+    .chip-container { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 12px; }
+    .chip { background: #EAF6F1; color: #0F2A44; border: 1px solid #BFE8CD; border-radius: 99px; padding: 6px 11px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s ease; text-align: left; }
+    .chip:hover, .chip:active { background: #0EA47A; color: #fff; border-color: #0EA47A; }
+
+    /* DISCOUNT DANGER ZONE TABLE */
+    .dz-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+    .dz-table th, .dz-table td { padding: 8px 10px; border-bottom: 1px solid #E2EAF0; text-align: left; }
+    .dz-table th { background: #EAF6F1; color: #0F2A44; font-weight: 700; }
+    .dz-safe { color: #145A32; font-weight: 700; }
+    .dz-loss { color: #8B1A1A; font-weight: 700; }
+
     /* MODAL ARCHITECTURE */
     .modal-backdrop { position: fixed; inset: 0; background: rgba(15,42,68,0.65); display: none; align-items: flex-end; justify-content: center; z-index: 999; }
     .modal-backdrop.open { display: flex; }
@@ -229,10 +242,10 @@
     <input id="beWeek" type="text" inputmode="numeric" value="50">
 
     <h3>Ongoing Monthly Running Costs (Optional)</h3>
-    <div class="muted">Recurring monthly overheads you must pay (e.g. shop rent, apprentice, fuel).</div>
+    <div class="muted">Recurring bills you must pay every month (stall rent, light/generator, shop assistant).</div>
     <div id="beMonthly"></div>
     <button type="button" onclick="openStepModal('breakeven')" style="background:#EAF6F1;color:#0F2A44">
-      + Add ongoing monthly running cost (Rent, light, salary)
+      + Add ongoing monthly running bill (Rent, light, salary)
     </button>
 
     <button type="button" onclick="calcBE()">When will I break even?</button>
@@ -254,7 +267,7 @@
     <input id="bPrice" type="text" inputmode="numeric" value="6,050">
 
     <label>Items included in this bundle:</label>
-    <div class="muted">Add products with their quantities and unit true costs.</div>
+    <div class="muted">Include your products, hamper basket/box, ribbon, and any customer freebie.</div>
     <div id="bItems">
       <div class="custom-row" data-name="Oloyin 1kg">
         <label>Oloyin 1kg</label>
@@ -276,21 +289,27 @@
       </div>
     </div>
     <button type="button" onclick="openStepModal('bundle')" style="background:#EAF6F1;color:#0F2A44">
-      + Add item into this bundle
+      + Add item, packaging or freebie to this bundle
     </button>
 
     <h3>B. Discount / Markdown Check</h3>
     <label>Normal price before discount (<span class="cSym">₦</span>)</label>
-    <input id="dSell" type="text" inputmode="numeric" value="3,350">
+    <input id="dSell" type="text" inputmode="numeric" value="3,350" oninput="calcBundle()">
 
     <label>True cost of ONE unit (<span class="cSym">₦</span>)</label>
-    <input id="dCost" type="text" inputmode="numeric" value="2,579">
+    <input id="dCost" type="text" inputmode="numeric" value="2,579" oninput="calcBundle()">
 
     <label>Discount you want to give (%)</label>
-    <input id="dPct" type="text" inputmode="numeric" value="10">
+    <input id="dPct" type="text" inputmode="numeric" value="10" oninput="calcBundle()">
 
     <button type="button" onclick="calcBundle()">Check my bundle &amp; discount</button>
     <div id="bundleOut"></div>
+
+    <div style="margin-top:16px">
+      <h3>Discount Danger Zone — Where profit turns into loss</h3>
+      <div class="muted">Check how much profit you keep at different discount percentages:</div>
+      <div id="dangerZoneTable"></div>
+    </div>
 
     <div class="step-nav">
       <button type="button" class="ghost" onclick="prevCalc()">Back: Break-Even</button>
@@ -328,8 +347,17 @@
 
     <!-- FORM FOR STEP 1: PRICE CALCULATOR (UNIT COST) -->
     <div id="modalFormPrice" style="display:none">
+      <span class="chip-label">Quick Suggestions (Tap to fill):</span>
+      <div class="chip-container">
+        <button type="button" class="chip" onclick="applyPriceChip('Park errand boy / dispatch', 'batch', 1500, 30)">🛵 Errand Boy (₦1,500 for 30)</button>
+        <button type="button" class="chip" onclick="applyPriceChip('Market ticket / Gate levy', 'batch', 200, 20)">🎫 Market Levy (₦200 for 20)</button>
+        <button type="button" class="chip" onclick="applyPriceChip('Generator fuel for sealing', 'batch', 2000, 40)">⚡ Gen Fuel (₦2,000 for 40)</button>
+        <button type="button" class="chip" onclick="applyPriceChip('Custom Brand Sticker', 'direct', 50)">🏷️ Brand Sticker (₦50/ea)</button>
+        <button type="button" class="chip" onclick="applyPriceChip('Nylon tie & sealing tape', 'direct', 20)">🎀 Tie & Tape (₦20/ea)</button>
+      </div>
+
       <label>What is this expense called?</label>
-      <input id="pAddName" placeholder="e.g. Market levy, delivery runner, generator fuel">
+      <input id="pAddName" placeholder="e.g. Park errand boy, market ticket, sealing tape">
 
       <label>How did you pay for this?</label>
       <div class="segmented">
@@ -339,27 +367,30 @@
 
       <div id="pDirectFields">
         <label>Amount for ONE unit (<span class="cSym">₦</span>)</label>
-        <input id="pAddUnitAmount" type="text" inputmode="numeric" placeholder="e.g. 50">
+        <input id="pAddUnitAmount" type="text" inputmode="numeric" placeholder="e.g. 50 (for just one sticker or tie)">
       </div>
 
       <div id="pBatchFields" style="display:none">
         <label>Total amount paid for the whole batch (<span class="cSym">₦</span>)</label>
-        <input id="pAddBatchTotal" type="text" inputmode="numeric" placeholder="e.g. 2,000" oninput="updateBatchPreview()">
+        <input id="pAddBatchTotal" type="text" inputmode="numeric" placeholder="e.g. 1,500 (total given to errand boy)" oninput="updateBatchPreview()">
         
         <label>How many units did this batch produce / cover?</label>
-        <input id="pAddBatchCount" type="text" inputmode="numeric" placeholder="e.g. 40" oninput="updateBatchPreview()">
+        <input id="pAddBatchCount" type="text" inputmode="numeric" placeholder="e.g. 30 (total packs brought from park)" oninput="updateBatchPreview()">
 
         <div class="calc-preview-box">
           Per-unit cost: <b id="pBatchCalcPreview">₦0</b> per unit
-          <div class="muted">We will add this exact per-unit cost to your product.</div>
+          <div class="muted">We divide the batch cost by units and add it straight to your true cost.</div>
         </div>
       </div>
     </div>
 
     <!-- FORM FOR STEP 2: STARTUP COST ESTIMATOR (CAPITAL ITEM) -->
     <div id="modalFormStartup" style="display:none">
+      <span class="chip-label" id="sChipTitle">Recommended for your business (Tap to fill):</span>
+      <div class="chip-container" id="sChipContainer"></div>
+
       <label>What startup thing do you need?</label>
-      <input id="sAddName" placeholder="e.g. Shop rent (6 months), CAC registration, Signboard">
+      <input id="sAddName" placeholder="e.g. 100kg digital scale, shop 6-month rent, impulse sealer">
 
       <label>Category of expense</label>
       <select id="sAddCategory">
@@ -372,7 +403,7 @@
       </select>
 
       <label>Estimated Cost (<span class="cSym">₦</span>)</label>
-      <input id="sAddAmount" type="text" inputmode="numeric" placeholder="e.g. 150,000">
+      <input id="sAddAmount" type="text" inputmode="numeric" placeholder="e.g. 45,000">
 
       <label>Is this essential for Day 1 launch?</label>
       <div class="segmented">
@@ -384,29 +415,53 @@
 
     <!-- FORM FOR STEP 3: BREAK-EVEN (MONTHLY OVERHEAD) -->
     <div id="modalFormBreakeven" style="display:none">
-      <label>What ongoing monthly bill is this?</label>
-      <input id="beAddName" placeholder="e.g. Monthly shop rent, apprentice allowance, power">
+      <span class="chip-label">Common Recurring Bills (Tap to fill):</span>
+      <div class="chip-container">
+        <button type="button" class="chip" onclick="applyBreakevenChip('Shop / Stall Rent', 15000, 'monthly')">🏪 Stall Rent (₦15k/mo)</button>
+        <button type="button" class="chip" onclick="applyBreakevenChip('Generator fuel / NEPA light', 3500, 'weekly')">💡 Gen Fuel (₦3.5k/wk)</button>
+        <button type="button" class="chip" onclick="applyBreakevenChip('Shop Assistant / Sales Girl', 6000, 'weekly')">🤝 Sales Girl (₦6k/wk)</button>
+        <button type="button" class="chip" onclick="applyBreakevenChip('Phone Data for WhatsApp Orders', 4000, 'monthly')">📱 WhatsApp Data (₦4k/mo)</button>
+        <button type="button" class="chip" onclick="applyBreakevenChip('Market Security & Sanitation Levy', 2500, 'monthly')">🛡️ Security Levy (₦2.5k/mo)</button>
+      </div>
 
-      <label>Monthly Amount (<span class="cSym">₦</span> / month)</label>
-      <input id="beAddAmount" type="text" inputmode="numeric" placeholder="e.g. 20,000">
+      <label>What ongoing bill is this?</label>
+      <input id="beAddName" placeholder="e.g. Stall rent, generator fuel, shop girl weekly salary">
+
+      <label>How often do you pay this?</label>
+      <div class="segmented">
+        <button type="button" id="beFreqMonthly" class="active" onclick="setBreakevenFreq('monthly')">Monthly</button>
+        <button type="button" id="beFreqWeekly" onclick="setBreakevenFreq('weekly')">Weekly (4 weeks/mo)</button>
+      </div>
+
+      <label id="beAmountLabel">Amount (<span class="cSym">₦</span> per month)</label>
+      <input id="beAddAmount" type="text" inputmode="numeric" placeholder="e.g. 15,000" oninput="updateBreakevenPreview()">
       
       <div class="calc-preview-box">
-        We will tell you how many units you must sell every single month just to pay this bill!
+        Effective monthly bill: <b id="beMonthlyPreview">₦0 / month</b>
+        <div class="muted">We will tell you how many units you must sell every month just to pay this bill!</div>
       </div>
     </div>
 
     <!-- FORM FOR STEP 4: BUNDLE CHECKER (ITEM IN COMBO) -->
     <div id="modalFormBundle" style="display:none">
-      <label>Select from Saved Products (or add custom):</label>
+      <label>Select from Saved Products:</label>
       <select id="bSavedSelect" onchange="onBundleSelectProduct()">
         <option value="">-- Choose from your saved products --</option>
       </select>
 
+      <span class="chip-label">Or Add Packaging / Bonus Freebie (Tap to fill):</span>
+      <div class="chip-container">
+        <button type="button" class="chip" onclick="applyBundleChip('Hamper Basket / Special Gift Box', 1200, 1)">🎁 Hamper Box (₦1,200)</button>
+        <button type="button" class="chip" onclick="applyBundleChip('Ribbon & Thank-You Card', 250, 1)">🎀 Ribbon & Card (₦250)</button>
+        <button type="button" class="chip" onclick="applyBundleChip('Free Gift / Bonus Sample to Customer', 400, 1)">✨ Customer Freebie (₦400)</button>
+        <button type="button" class="chip" onclick="applyBundleChip('Heavy Branded Carrier Bag', 150, 1)">🛍️ Carrier Bag (₦150)</button>
+      </div>
+
       <label style="margin-top:10px">Item Name in this bundle</label>
-      <input id="bAddName" placeholder="e.g. Oloyin Beans 1kg, Special Gift Box">
+      <input id="bAddName" placeholder="e.g. 2kg Rice, hamper basket, thank-you card, free sample">
 
       <label>True Cost for ONE unit (<span class="cSym">₦</span>)</label>
-      <input id="bAddUnitCost" type="text" inputmode="numeric" placeholder="e.g. 2,579" oninput="updateBundlePreview()">
+      <input id="bAddUnitCost" type="text" inputmode="numeric" placeholder="e.g. 2,579 (true cost per item)" oninput="updateBundlePreview()">
 
       <label>Quantity of this item in bundle</label>
       <input id="bAddQty" type="number" value="1" min="1" oninput="updateBundlePreview()">
@@ -526,11 +581,50 @@ function finishFlow() {
 }
 
 // -----------------------------------------------------------------------------
-// STEP-AWARE MODAL SYSTEM
+// STEP-AWARE MODAL SYSTEM WITH CONTEXTUAL CHIPS
 // -----------------------------------------------------------------------------
 var _activeModalTarget = "price";
 var _priceCostMode = "direct"; // direct | batch
 var _startupPriority = "essential"; // essential | later
+var _breakevenFreq = "monthly"; // monthly | weekly
+
+var STARTUP_SUGGESTIONS = {
+  foodstuff: [
+    { name: "100kg Digital Bench Scale", cat: "Equipment", cost: 35000, pri: "essential" },
+    { name: "Manual Impulse Bag Sealer", cat: "Equipment", cost: 22000, pri: "essential" },
+    { name: "Wooden Pallets to keep sacks off floor", cat: "Equipment", cost: 18000, pri: "essential" },
+    { name: "Market Stall / Kiosk Space Advance", cat: "Space", cost: 120000, pri: "essential" },
+    { name: "Market Union & Security Registration", cat: "Legal", cost: 15000, pri: "later" }
+  ],
+  baking: [
+    { name: "Cake Turntable & Palette Knife Set", cat: "Equipment", cost: 16000, pri: "essential" },
+    { name: "Oven Thermometer & Timer", cat: "Equipment", cost: 8500, pri: "essential" },
+    { name: "Electric Stand/Hand Mixer 5-Speed", cat: "Equipment", cost: 55000, pri: "essential" },
+    { name: "Glass Countertop Cake Display", cat: "Space", cost: 65000, pri: "later" },
+    { name: "Custom Branded Aprons & Box Ribbons", cat: "Branding", cost: 18000, pri: "later" }
+  ],
+  thrift: [
+    { name: "Handheld Vertical Steam Iron", cat: "Equipment", cost: 32000, pri: "essential" },
+    { name: "Full-Length Standing Mirror", cat: "Equipment", cost: 28000, pri: "essential" },
+    { name: "Wooden Hangers Set (50 pcs)", cat: "Equipment", cost: 18000, pri: "essential" },
+    { name: "Photo Ring Light for Instagram Shoots", cat: "Branding", cost: 22000, pri: "essential" },
+    { name: "Clothing Tag Gun & Price Labels", cat: "Equipment", cost: 8500, pri: "later" }
+  ],
+  skincare: [
+    { name: "Precision Digital Gram Scale (0.01g)", cat: "Equipment", cost: 15000, pri: "essential" },
+    { name: "Stainless Steel Double Boiler Pot", cat: "Equipment", cost: 25000, pri: "essential" },
+    { name: "High-Speed Immersion Hand Blender", cat: "Equipment", cost: 28000, pri: "essential" },
+    { name: "First 100 Amber PET Jars & Droppers", cat: "Stock", cost: 48000, pri: "essential" },
+    { name: "Lab Sanitizer & Safety Gloves Kit", cat: "Equipment", cost: 12000, pri: "essential" }
+  ],
+  catering: [
+    { name: "Commercial 100L Cold Storage Cooler", cat: "Equipment", cost: 45000, pri: "essential" },
+    { name: "Heavy Aluminum Stock Pots (Size 4)", cat: "Equipment", cost: 42000, pri: "essential" },
+    { name: "PET Bottle Cap Crimper / Sealer", cat: "Equipment", cost: 24000, pri: "essential" },
+    { name: "Fine Cloth Filtration Mesh for Zobo", cat: "Equipment", cost: 8000, pri: "essential" },
+    { name: "Plastic Event Delivery Crates (5 pcs)", cat: "Equipment", cost: 25000, pri: "later" }
+  ]
+};
 
 function openStepModal(target) {
   _activeModalTarget = target;
@@ -545,7 +639,7 @@ function openStepModal(target) {
 
   if (target === "price") {
     document.getElementById("modalTitle").innerText = "Add Another Cost — For ONE Unit";
-    document.getElementById("modalSubtitle").innerText = "Include extra expenses (direct or batch) so they don't eat your profit.";
+    document.getElementById("modalSubtitle").innerText = "Include extra expenses (errand boy, market levy, fuel) so you don't price blind.";
     document.getElementById("pAddName").value = "";
     document.getElementById("pAddUnitAmount").value = "";
     document.getElementById("pAddBatchTotal").value = "";
@@ -553,21 +647,24 @@ function openStepModal(target) {
     setPriceCostMode("direct");
     document.getElementById("modalFormPrice").style.display = "block";
   } else if (target === "startup") {
+    var curTmpl = document.getElementById("tmpl") ? document.getElementById("tmpl").value : "foodstuff";
     document.getElementById("modalTitle").innerText = "Add Startup Capital Need";
-    document.getElementById("modalSubtitle").innerText = "All one-time purchases before your very first sale.";
+    document.getElementById("modalSubtitle").innerText = "One-time equipment, shop advance, permits or tools needed before opening.";
+    renderStartupChips(curTmpl);
     document.getElementById("sAddName").value = "";
     document.getElementById("sAddAmount").value = "";
     setStartupPriority("essential");
     document.getElementById("modalFormStartup").style.display = "block";
   } else if (target === "breakeven") {
-    document.getElementById("modalTitle").innerText = "Add Ongoing Monthly Running Cost";
-    document.getElementById("modalSubtitle").innerText = "Monthly bills (rent, staff, fuel) you must pay every month.";
+    document.getElementById("modalTitle").innerText = "Add Ongoing Monthly Running Bill";
+    document.getElementById("modalSubtitle").innerText = "Recurring bills you must pay every month regardless of sales volume.";
     document.getElementById("beAddName").value = "";
     document.getElementById("beAddAmount").value = "";
+    setBreakevenFreq("monthly");
     document.getElementById("modalFormBreakeven").style.display = "block";
   } else if (target === "bundle") {
-    document.getElementById("modalTitle").innerText = "Add Product / Item to Bundle";
-    document.getElementById("modalSubtitle").innerText = "Include a product with quantity and true unit cost.";
+    document.getElementById("modalTitle").innerText = "Add Item, Packaging or Freebie to Bundle";
+    document.getElementById("modalSubtitle").innerText = "Account for all products, gift baskets, ribbons, and customer freebies.";
     populateBundleSavedDropdown();
     document.getElementById("bAddName").value = "";
     document.getElementById("bAddUnitCost").value = "";
@@ -584,7 +681,20 @@ function closeStepModal() {
   if (m) m.classList.remove("open");
 }
 
-// STEP 1 MODAL HELPERS
+// STEP 1 CHIP ACTIONS
+function applyPriceChip(name, mode, val1, val2) {
+  document.getElementById("pAddName").value = name;
+  if (mode === "batch") {
+    setPriceCostMode("batch");
+    document.getElementById("pAddBatchTotal").value = val1.toLocaleString();
+    document.getElementById("pAddBatchCount").value = val2;
+    updateBatchPreview();
+  } else {
+    setPriceCostMode("direct");
+    document.getElementById("pAddUnitAmount").value = val1.toLocaleString();
+  }
+}
+
 function setPriceCostMode(mode) {
   _priceCostMode = mode;
   var bDirect = document.getElementById("pModeDirect");
@@ -613,7 +723,23 @@ function updateBatchPreview() {
   document.getElementById("pBatchCalcPreview").innerText = fmt(perUnit);
 }
 
-// STEP 2 MODAL HELPERS
+// STEP 2 CHIP ACTIONS
+function renderStartupChips(tmplKey) {
+  var container = document.getElementById("sChipContainer");
+  if (!container) return;
+  var list = STARTUP_SUGGESTIONS[tmplKey] || STARTUP_SUGGESTIONS.foodstuff;
+  container.innerHTML = list.map(function(item, idx) {
+    return "<button type='button' class='chip' onclick='applyStartupChip(" + JSON.stringify(item.name) + ", " + JSON.stringify(item.cat) + ", " + item.cost + ", " + JSON.stringify(item.pri) + ")'>" + item.name + " (" + fmt(item.cost) + ")</button>";
+  }).join("");
+}
+
+function applyStartupChip(name, cat, cost, pri) {
+  document.getElementById("sAddName").value = name;
+  document.getElementById("sAddCategory").value = cat;
+  document.getElementById("sAddAmount").value = cost.toLocaleString();
+  setStartupPriority(pri);
+}
+
 function setStartupPriority(pri) {
   _startupPriority = pri;
   var bEss = document.getElementById("sPriEssential");
@@ -623,15 +749,46 @@ function setStartupPriority(pri) {
   if (pri === "essential") {
     bEss.classList.add("active");
     bLat.classList.remove("active");
-    hint.innerText = "Tick-marked for Day 1 launch (Lean Start).";
+    hint.innerText = "Tick-marked for Day 1 launch (Lean Start budget).";
   } else {
     bEss.classList.remove("active");
     bLat.classList.add("active");
-    hint.innerText = "Unchecked initially. Can buy later when profit arrives (Proper Start).";
+    hint.innerText = "Unchecked initially. Can wait until business makes profit (Proper Start).";
   }
 }
 
-// STEP 4 MODAL HELPERS
+// STEP 3 CHIP ACTIONS
+function applyBreakevenChip(name, amount, freq) {
+  document.getElementById("beAddName").value = name;
+  document.getElementById("beAddAmount").value = amount.toLocaleString();
+  setBreakevenFreq(freq);
+}
+
+function setBreakevenFreq(freq) {
+  _breakevenFreq = freq;
+  var bM = document.getElementById("beFreqMonthly");
+  var bW = document.getElementById("beFreqWeekly");
+  var lbl = document.getElementById("beAmountLabel");
+
+  if (freq === "monthly") {
+    bM.classList.add("active");
+    bW.classList.remove("active");
+    lbl.innerHTML = "Amount (<span class='cSym'>" + (CURR_SYMBOLS[_curr] || "₦") + "</span> per month)";
+  } else {
+    bM.classList.remove("active");
+    bW.classList.add("active");
+    lbl.innerHTML = "Amount (<span class='cSym'>" + (CURR_SYMBOLS[_curr] || "₦") + "</span> per week)";
+  }
+  updateBreakevenPreview();
+}
+
+function updateBreakevenPreview() {
+  var amt = parseNum(document.getElementById("beAddAmount").value);
+  var monthlyAmt = (_breakevenFreq === "weekly") ? (amt * 4) : amt;
+  document.getElementById("beMonthlyPreview").innerText = fmt(monthlyAmt) + " / month";
+}
+
+// STEP 4 CHIP ACTIONS
 function populateBundleSavedDropdown() {
   var sel = document.getElementById("bSavedSelect");
   if (!sel) return;
@@ -659,6 +816,13 @@ function onBundleSelectProduct() {
   }
 }
 
+function applyBundleChip(name, cost, qty) {
+  document.getElementById("bAddName").value = name;
+  document.getElementById("bAddUnitCost").value = cost.toLocaleString();
+  document.getElementById("bAddQty").value = qty;
+  updateBundlePreview();
+}
+
 function updateBundlePreview() {
   var cost = parseNum(document.getElementById("bAddUnitCost").value);
   var qty = Math.max(1, parseNum(document.getElementById("bAddQty").value));
@@ -670,7 +834,7 @@ function updateBundlePreview() {
 function confirmStepAdd() {
   if (_activeModalTarget === "price") {
     var name = document.getElementById("pAddName").value.trim();
-    if (!name) { alert("Please type what this cost is called (e.g. Market levy)."); return; }
+    if (!name) { alert("Please type what this cost is called (e.g. Park errand boy)."); return; }
     
     var unitCost = 0;
     var badgeText = "";
@@ -721,7 +885,7 @@ function confirmStepAdd() {
     var sName = document.getElementById("sAddName").value.trim();
     var sCat = document.getElementById("sAddCategory").value;
     var sAmt = parseNum(document.getElementById("sAddAmount").value);
-    if (!sName) { alert("Please type the startup item name (e.g. Shop rent)."); return; }
+    if (!sName) { alert("Please type the startup item name (e.g. 100kg digital scale)."); return; }
     if (sAmt <= 0) { alert("Please enter the estimated cost."); return; }
 
     var isChecked = (_startupPriority === "essential");
@@ -777,9 +941,12 @@ function confirmStepAdd() {
 
   } else if (_activeModalTarget === "breakeven") {
     var beName = document.getElementById("beAddName").value.trim();
-    var beAmt = parseNum(document.getElementById("beAddAmount").value);
-    if (!beName) { alert("Please name this ongoing monthly bill."); return; }
-    if (beAmt <= 0) { alert("Please enter the monthly amount."); return; }
+    var rawAmt = parseNum(document.getElementById("beAddAmount").value);
+    if (!beName) { alert("Please name this ongoing bill (e.g. Stall rent)."); return; }
+    if (rawAmt <= 0) { alert("Please enter the amount."); return; }
+
+    var beAmt = (_breakevenFreq === "weekly") ? (rawAmt * 4) : rawAmt;
+    var freqNote = (_breakevenFreq === "weekly") ? (fmt(rawAmt) + "/wk × 4 = " + fmt(beAmt) + "/mo") : (fmt(beAmt) + "/mo");
 
     var beRow = document.createElement("div");
     beRow.className = "custom-row";
@@ -788,7 +955,7 @@ function confirmStepAdd() {
     beLbl.textContent = beName + " ";
     var beBadge = document.createElement("span");
     beBadge.className = "badge badge-warn";
-    beBadge.textContent = "Monthly overhead";
+    beBadge.textContent = freqNote;
     beLbl.appendChild(beBadge);
 
     var beInp = document.createElement("input");
@@ -816,7 +983,7 @@ function confirmStepAdd() {
     var bName = document.getElementById("bAddName").value.trim();
     var bUnitCost = parseNum(document.getElementById("bAddUnitCost").value);
     var bQty = Math.max(1, parseNum(document.getElementById("bAddQty").value));
-    if (!bName) { alert("Please specify the item name."); return; }
+    if (!bName) { alert("Please specify the item name (e.g. 2kg Rice or Hamper box)."); return; }
     if (bUnitCost <= 0) { alert("Please enter the unit true cost."); return; }
 
     var bRow = document.createElement("div");
@@ -942,6 +1109,8 @@ function calcPrice() {
   if (dCost) dCost.value = Math.round(tc).toLocaleString();
   var dSell = document.getElementById("dSell");
   if (dSell) dSell.value = Math.round(sell).toLocaleString();
+
+  calcBundle();
 }
 
 function shareWA() {
@@ -1056,34 +1225,34 @@ function exportPDF() {
 var TEMPLATES = {
   foodstuff: [
     ["First stock — 2 bags of rice/beans/pepper", "Initial wholesale goods to sell first", 160000],
-    ["Transport — logistics from market", "Delivery to your shop/house", 12000],
-    ["Packaging — bags, pouches, labels", "First 200 bags", 36000],
-    ["Cleaning & sorting labour", "Helpers or your own preparation time", 15000],
-    ["Scales & storage buckets", "Tools to keep stock clean & safe", 25000]
+    ["Transport — logistics from wholesale market", "Bus, bike or truck dispatch to shop/house", 12000],
+    ["Packaging — first batch of 200 bags/pouches", "Thick nylon bags, seals, printed brand stickers", 36000],
+    ["Destoning, cleaning & sorting labour", "Helpers or your own preparation time", 15000],
+    ["Storage buckets & digital bench scale", "Tools to keep stock clean, dry and rat-proof", 25000]
   ],
   baking: [
-    ["First baking ingredients", "Flour, butter, sugar, eggs for 20 orders", 95000],
-    ["Packaging & cake boxes", "Boxes, boards, ribbons", 35000],
-    ["Baking tools & mixer", "Pans, spatulas, 5-speed hand mixer", 55000],
-    ["Gas / Electricity share", "Power for first batches", 15000]
+    ["First baking ingredients run", "Flour, butter, sugar, eggs, flavor for 20 orders", 95000],
+    ["Cake packaging starter bundle", "20 luxury boxes, gold cake boards, ribbons", 35000],
+    ["Baking tools & 5-speed hand mixer", "Round pans, spatulas, nozzles, mixing bowls", 55000],
+    ["Gas cylinder refill / Electricity share", "Power for first 20 cake batches", 15000]
   ],
   skincare: [
-    ["Base raw materials", "Shea butter, almond oil, essential oils", 65000],
-    ["Amber PET jars & labels", "First 100 containers", 48000],
-    ["High-speed immersion mixer", "Blending tools", 28000],
-    ["Sanitation & measuring gear", "Sterilizing set", 15000]
+    ["Base raw materials & essential oils", "10kg unrefined shea butter, almond oil, oils", 65000],
+    ["First 100 amber PET jars & waterproof labels", "Jars, inner lids, tamper seals", 48000],
+    ["High-speed immersion hand blender", "Whisks and stainless steel mixing bowls", 28000],
+    ["Sanitation & measuring gear", "Digital scale 0.01g, cylinders, alcohol spray", 15000]
   ],
   thrift: [
-    ["First Grade-A bale", "Bale of mixed denim/dresses", 140000],
-    ["Logistics & dispatch", "Transport from wholesale market", 15000],
-    ["Steam iron & hangers", "Garment care tools", 35000],
-    ["Packaging & delivery bags", "Ziplock bags & stickers", 20000]
+    ["First Grade-A mixed clothing bale", "One bale of selected dresses/jeans", 140000],
+    ["Logistics & market dispatch runner", "Transport from Katangua / Yaba wholesale market", 15000],
+    ["Heavy steam iron & wooden hangers", "Garment care tools to make clothes look brand new", 35000],
+    ["Delivery packaging & branded stickers", "Small ziplock bags & thank-you stickers", 20000]
   ],
   catering: [
-    ["Stock pots & cooking gear", "Pots, coolers, cooking ladles", 55000],
-    ["First bulk ingredients run", "Event foodstuff", 80000],
-    ["Serving plates & disposable foils", "First order supplies", 30000],
-    ["Transport to venue", "Logistics for event", 20000]
+    ["Heavy aluminum stock pots & ladles", "Size 4 cooking pots, commercial spoons", 55000],
+    ["First bulk ingredients & drinks run", "Wholesale foodstuff for your first catering gig", 80000],
+    ["Serving plates & disposable foils", "First event supplies (foil bowls, plastic forks)", 30000],
+    ["Venue delivery & logistics share", "Van/cab dispatch to carry food to client", 20000]
   ]
 };
 
@@ -1164,7 +1333,8 @@ function calcBE() {
   var monthlyUnits = monthlyOverhead > 0 ? Math.ceil(monthlyOverhead / prof) : 0;
 
   var monthlyNotice = monthlyOverhead > 0
-    ? "<p style='margin-top:8px;border-top:1px dashed #BFE8CD;padding-top:8px'><b>Monthly Overhead:</b> You have " + fmt(monthlyOverhead) + "/mo in ongoing bills. You must sell <b>" + monthlyUnits + " units EVERY MONTH</b> just to keep the business open!</p>"
+    ? "<p style='margin-top:10px;border-top:1px dashed #BFE8CD;padding-top:10px'><b>Monthly Overhead:</b> You have " + fmt(monthlyOverhead) + "/mo in ongoing bills.<br>" +
+      "You must sell <b>" + monthlyUnits + " units EVERY MONTH</b> just to keep your shop open before making personal profit!</p>"
     : "";
 
   document.getElementById("beOut").innerHTML =
@@ -1178,7 +1348,7 @@ function calcBE() {
 }
 
 // -----------------------------------------------------------------------------
-// 4. BUNDLE & DISCOUNT LOGIC (WITH QUANTITIES)
+// 4. BUNDLE & DISCOUNT LOGIC (WITH DANGER ZONE TABLE)
 // -----------------------------------------------------------------------------
 function calcBundle() {
   var bp = parseNum(document.getElementById("bPrice").value);
@@ -1203,6 +1373,7 @@ function calcBundle() {
   if (dPct >= 100) {
     document.getElementById("bundleOut").innerHTML =
       "<div class='loss-banner'>A 100% discount means free. You will lose everything. Use a smaller discount (e.g. 10%).</div>";
+    renderDangerZoneTable(dSell, dCost);
     return;
   }
 
@@ -1222,6 +1393,32 @@ function calcBundle() {
       "<h3>Bundle: Charge " + fmt(bp) + " (Items Cost: " + fmt(sum) + ")</h3>" +
       "<p>Discount: Charge " + fmt(dPrice) + " after " + dPct + "% off (Cost: " + fmt(dCost) + ").</p>" +
     "</div>" + bBanner + dBanner;
+
+  renderDangerZoneTable(dSell, dCost);
+}
+
+function renderDangerZoneTable(price, cost) {
+  var el = document.getElementById("dangerZoneTable");
+  if (!el || price <= 0 || cost <= 0) return;
+
+  var tiers = [5, 10, 15, 20, 25, 30];
+  var rows = tiers.map(function(pct) {
+    var discPrice = price * (1 - pct / 100);
+    var profit = discPrice - cost;
+    var isSafe = profit >= 0;
+    var statusClass = isSafe ? "dz-safe" : "dz-loss";
+    var statusText = isSafe ? ("SAFE (+" + fmt(profit) + ")") : ("LOSS (" + fmt(profit) + ")");
+    return "<tr>" +
+      "<td><b>" + pct + "% off</b></td>" +
+      "<td>" + fmt(discPrice) + "</td>" +
+      "<td class='" + statusClass + "'>" + statusText + "</td>" +
+    "</tr>";
+  });
+
+  el.innerHTML = "<table class='dz-table'>" +
+    "<thead><tr><th>Discount %</th><th>New Selling Price</th><th>Profit / Loss Outcome</th></tr></thead>" +
+    "<tbody>" + rows.join("") + "</tbody>" +
+  "</table>";
 }
 
 // REGISTER SERVICE WORKER
