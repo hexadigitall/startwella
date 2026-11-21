@@ -41,7 +41,8 @@ This document maps the project phases from [PHASES.md](file:///D:/projects/start
   - [x] Defined complete 5-document governance suite (`AGENTS.md`, `CONTENT.md`, `README.md`, `PHASES.md`, `ARCHITECTURE.md`).
   - [x] Fixed step indexing bug (`STEP_LABELS[idx]`) and duplicate `renderTabs()`.
   - [x] Modernized [src/lib/calculations.js](file:///D:/projects/startwella/startwella-v1/src/lib/calculations.js) with comma-tolerant `parseNumber` and margin protection.
-  - [x] Created [tests/calculations.test.js](file:///D:/projects/startwella/startwella-v1/tests/calculations.test.js) with 20 unit tests across zero, high waste, and dirty inputs (100% pass).
+  - [x] Implemented Step-Aware "Add Another..." Architecture: tailored modal forms, batch cost allocation (Step 1), Lean vs Proper checkboxes (Step 2), monthly running overheads (Step 3), and saved products + quantities (Step 4).
+  - [x] Created [tests/calculations.test.js](file:///D:/projects/startwella/startwella-v1/tests/calculations.test.js) with 23 unit tests across zero, high waste, batch allocation, and bundle quantities (100% pass).
   - [x] Built multi-currency toggle supporting NGN (₦), USD ($), and GHS (GH₵).
   - [x] Added PDF/print engine with clean print stylesheets.
   - [x] Implemented PWA `manifest.json` and `sw.js` offline cache.

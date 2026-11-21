@@ -13,7 +13,9 @@ import {
   bundleCheck,
   discountCheck,
   formatCurrency,
-  formatNGN
+  formatNGN,
+  batchToUnitCost,
+  monthlyBreakEvenUnits
 } from '../src/lib/calculations.js';
 
 test('1. parseNumber handles raw numbers, strings, commas, currency symbols', () => {
@@ -187,4 +189,29 @@ test('20. parseNumber and calculation resilience with dirty user input', () => {
   });
   assert.equal(dirtyResult.directCost, 2450);
   assert.equal(Math.round(dirtyResult.trueCost), 2579);
+});
+
+test('21. batchToUnitCost accurately calculates per-unit allocation of batch costs', () => {
+  // ₦2,000 dispatch cost for 40 units = ₦50 per unit
+  assert.equal(batchToUnitCost(2000, 40), 50);
+  // ₦3,500 fuel for 70 loaves = ₦50 per loaf
+  assert.equal(batchToUnitCost(3500, 70), 50);
+});
+
+test('22. monthlyBreakEvenUnits calculates required monthly sales for ongoing overheads', () => {
+  // ₦30,000 monthly rent & utilities / ₦771 profit per unit = 38.9 -> 39 units
+  assert.equal(monthlyBreakEvenUnits(30000, 771), 39);
+  assert.equal(monthlyBreakEvenUnits(30000, 0), Infinity);
+});
+
+test('23. bundleCheck correctly computes bundle cost with item quantities', () => {
+  // Bundle with 2 packs of Beans (2 * 2579 = 5158) + 1 pack of Rice (2649) = 7807 total cost
+  // Bundle price 9000 -> profit 1193 -> SAFE
+  const check = bundleCheck(9000, [
+    { name: 'Oloyin Beans 1kg', unitCost: 2579, qty: 2 },
+    { name: 'Rice 1kg', unitCost: 2649, qty: 1 }
+  ]);
+  assert.equal(check.cost, 7807);
+  assert.equal(check.profit, 1193);
+  assert.equal(check.isSafe, true);
 });

@@ -22,7 +22,7 @@
     .card { background: #fff; border-radius: 14px; padding: 18px 16px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(15,42,68,0.06); }
     
     h2 { font-size: 19px; color: #0F2A44; margin-bottom: 6px; font-weight: 700; }
-    h3 { font-size: 16px; color: #0F2A44; margin: 16px 0 8px; font-weight: 700; }
+    h3 { font-size: 16px; color: #0F2A44; margin: 18px 0 8px; font-weight: 700; }
     .muted { font-size: 13px; color: #5A6B7C; line-height: 1.4; margin-top: 4px; }
 
     label { display: block; margin: 14px 0 5px; font-weight: 600; font-size: 14px; color: #0F2A44; }
@@ -52,10 +52,19 @@
     .safe-banner { background: #E6F6EE; border: 1px solid #BFE8CD; color: #145A32; border-radius: 10px; padding: 12px; margin-top: 12px; font-weight: 600; font-size: 14px; line-height: 1.4; }
     .next-action { background: #FFF7E6; border: 1px solid #F5D98A; border-radius: 10px; padding: 12px; margin-top: 12px; font-size: 13px; line-height: 1.4; color: #5B4100; }
 
-    .custom-row { position: relative; margin: 10px 0; }
-    .custom-row .remove-x { position: absolute; top: 32px; right: 8px; width: 30px !important; height: 30px !important; border-radius: 50%; background: #FDECEC !important; color: #D32F2F !important; font-size: 18px; line-height: 1; padding: 0; }
-    .custom-row label { padding-right: 40px; }
-    .custom-row input { padding-right: 44px; }
+    /* CUSTOM ROWS FOR STEP 1, 2, 3, 4 */
+    .custom-row { position: relative; margin: 12px 0; background: #F9FBFC; border: 1px solid #E2EAF0; border-radius: 10px; padding: 12px 14px; }
+    .custom-row .remove-x { position: absolute; top: 10px; right: 10px; width: 28px !important; height: 28px !important; border-radius: 50%; background: #FDECEC !important; color: #D32F2F !important; font-size: 18px; line-height: 1; padding: 0; margin: 0; }
+    .custom-row label { margin-top: 0; padding-right: 36px; }
+    .custom-row input { margin-top: 6px; background: #fff; }
+
+    .badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 6px; background: #EAF6F1; color: #0EA47A; margin-left: 6px; vertical-align: middle; }
+    .badge-warn { background: #FFF7E6; color: #B26B00; }
+    .badge-blue { background: #EBF3FA; color: #1D6FBE; }
+
+    .bundle-grid { display: grid; grid-template-columns: 80px 1fr 100px; gap: 8px; align-items: center; margin-top: 6px; }
+    .bundle-grid input { height: 44px; font-size: 14px; }
+    .bundle-subtotal { font-size: 13px; font-weight: 700; color: #0F2A44; text-align: right; }
 
     .saved-row { display: flex; gap: 8px; align-items: center; padding: 12px 0; border-bottom: 1px solid #EEF2F5; }
     .saved-row .meta { flex: 1; min-width: 0; }
@@ -65,11 +74,19 @@
     .saved-row .load { background: #EAF6F1 !important; color: #0F2A44 !important; }
     .saved-row .wa { background: #25D366 !important; }
 
-    .modal-backdrop { position: fixed; inset: 0; background: rgba(15,42,68,0.6); display: none; align-items: flex-end; justify-content: center; z-index: 999; }
+    /* MODAL ARCHITECTURE */
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(15,42,68,0.65); display: none; align-items: flex-end; justify-content: center; z-index: 999; }
     .modal-backdrop.open { display: flex; }
-    .modal { background: #fff; width: 100%; max-width: 480px; max-height: 88vh; overflow: auto; border-radius: 16px 16px 0 0; padding: 20px 16px; }
+    .modal { background: #fff; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; border-radius: 18px 18px 0 0; padding: 22px 18px; box-shadow: 0 -4px 20px rgba(0,0,0,0.15); }
     .modal-head { display: flex; justify-content: space-between; align-items: center; }
     .modal-close { width: 34px !important; height: 34px !important; border-radius: 50%; background: #EEF2F5 !important; color: #0F2A44 !important; font-size: 20px; padding: 0; margin: 0; }
+    
+    .segmented { display: flex; background: #EEF2F5; border-radius: 10px; padding: 4px; margin: 10px 0 14px; gap: 4px; }
+    .segmented button { flex: 1; height: 38px; margin-top: 0; font-size: 13px; background: transparent; color: #5A6B7C; font-weight: 600; border-radius: 7px; }
+    .segmented button.active { background: #fff; color: #0F2A44; box-shadow: 0 1px 3px rgba(0,0,0,0.08); font-weight: 700; }
+
+    .calc-preview-box { background: #EAF6F1; border: 1px solid #BFE8CD; border-radius: 10px; padding: 12px; margin: 12px 0; font-size: 13px; color: #0F2A44; }
+    .calc-preview-box b { font-size: 15px; color: #0EA47A; }
 
     .actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
     .actions-grid button { margin-top: 0; }
@@ -103,7 +120,7 @@
   <div id="phase2Step" class="muted">1. What should I charge?</div>
   <div id="stepTabs" class="tabs"></div>
 
-  <!-- STEP 1: PRICE CALCULATOR -->
+  <!-- STEP 1: PRICE CALCULATOR (UNIT TRUE COST) -->
   <section id="price" class="card">
     <h2>1. Price Calculator — What should I charge?</h2>
     <div class="muted">Know what one unit costs you so you never sell at a loss.</div>
@@ -126,9 +143,9 @@
     <input id="lab" type="text" inputmode="numeric" value="120">
 
     <h3>Anything else you spend for ONE unit?</h3>
-    <div class="muted">Examples: market levy, phone data, packaging ribbon.</div>
+    <div class="muted">Add custom unit expenses (e.g. market ticket, errand boy, fuel share).</div>
     <div id="pCustom"></div>
-    <button type="button" onclick="openAddModalDirect('price','Add another cost — for ONE unit','Example: Market levy. How much for ONE unit.')" style="background:#EAF6F1;color:#0F2A44">
+    <button type="button" onclick="openStepModal('price')" style="background:#EAF6F1;color:#0F2A44">
       + Add another cost for ONE unit
     </button>
 
@@ -158,7 +175,7 @@
     </div>
   </section>
 
-  <!-- STEP 2: STARTUP COST ESTIMATOR -->
+  <!-- STEP 2: STARTUP COST ESTIMATOR (ONE-TIME CAPITAL) -->
   <section id="startup" class="card" style="display:none">
     <h2>2. Startup Cost — How much money do I need to start?</h2>
     <p class="muted">All the money you need to spend <b>once</b> before you sell your first pack.</p>
@@ -173,13 +190,13 @@
     </select>
 
     <h3>What do you need to buy to start?</h3>
-    <p class="muted">Tick if you need it. Untick if you already have it.</p>
+    <p class="muted">Tick if you need it for Day 1. Untick if you already have it or will buy later.</p>
     <div id="sItems"></div>
 
     <h3>Anything else you need to start?</h3>
-    <p class="muted">Examples: shop rent, CAC registration, signboard, banner.</p>
+    <p class="muted">Custom startup items (e.g. shop rent advance, CAC registration, signboard).</p>
     <div id="sCustom"></div>
-    <button type="button" onclick="openAddModalDirect('startup','Add another thing to start','Example: Shop rent or CAC registration.')" style="background:#EAF6F1;color:#0F2A44">
+    <button type="button" onclick="openStepModal('startup')" style="background:#EAF6F1;color:#0F2A44">
       + Add another thing I need to start
     </button>
 
@@ -199,7 +216,7 @@
   <!-- STEP 3: BREAK-EVEN CALCULATOR -->
   <section id="breakeven" class="card" style="display:none">
     <h2>3. Break-Even — When will I get my money back?</h2>
-    <div class="muted">Find out how many units you must sell to recover your starting capital.</div>
+    <div class="muted">Find out how many units you must sell to recover your starting capital and cover monthly bills.</div>
 
     <label>Total money you spent to start (<span class="cSym">₦</span>)</label>
     <input id="beStart" type="text" inputmode="numeric" value="850,000">
@@ -210,6 +227,13 @@
 
     <label>How many packs will you sell in one week?</label>
     <input id="beWeek" type="text" inputmode="numeric" value="50">
+
+    <h3>Ongoing Monthly Running Costs (Optional)</h3>
+    <div class="muted">Recurring monthly overheads you must pay (e.g. shop rent, apprentice, fuel).</div>
+    <div id="beMonthly"></div>
+    <button type="button" onclick="openStepModal('breakeven')" style="background:#EAF6F1;color:#0F2A44">
+      + Add ongoing monthly running cost (Rent, light, salary)
+    </button>
 
     <button type="button" onclick="calcBE()">When will I break even?</button>
     <div id="beOut"></div>
@@ -223,28 +247,39 @@
   <!-- STEP 4: BUNDLE & DISCOUNT CHECKER -->
   <section id="bundle" class="card" style="display:none">
     <h2>4. Bundle &amp; Discount — Will this offer lose me money?</h2>
-    <div class="muted">Make sure combo deals and sales do not silently wipe out your profit.</div>
+    <div class="muted">Make sure combo deals and markdown promotions never eat your profit.</div>
 
-    <h3>A. Bundle / Combo Check</h3>
+    <h3>A. Bundle / Combo Pack Builder</h3>
     <label>Price you will charge for the whole bundle (<span class="cSym">₦</span>)</label>
     <input id="bPrice" type="text" inputmode="numeric" value="6,050">
 
-    <label>What does each item in the bundle really cost you?</label>
+    <label>Items included in this bundle:</label>
+    <div class="muted">Add products with their quantities and unit true costs.</div>
     <div id="bItems">
-      <div style="margin:12px 0">
-        <label>Item 1 (e.g. Oloyin 1kg)</label>
-        <input type="text" inputmode="numeric" class="bCost" value="2,579">
+      <div class="custom-row" data-name="Oloyin 1kg">
+        <label>Oloyin 1kg</label>
+        <div class="bundle-grid">
+          <div><input type="number" class="bQty" value="1" min="1" oninput="updateBundleLine(this)"></div>
+          <div><input type="text" inputmode="numeric" class="bCost" value="2,579" oninput="updateBundleLine(this)"></div>
+          <div class="bundle-subtotal">= <span class="bLineTotal">₦2,579</span></div>
+        </div>
+        <button type="button" class="remove-x" onclick="this.closest('.custom-row').remove(); calcBundle();">×</button>
       </div>
-      <div style="margin:12px 0">
-        <label>Item 2 (e.g. Rice 1kg)</label>
-        <input type="text" inputmode="numeric" class="bCost" value="2,649">
+      <div class="custom-row" data-name="Rice 1kg">
+        <label>Rice 1kg</label>
+        <div class="bundle-grid">
+          <div><input type="number" class="bQty" value="1" min="1" oninput="updateBundleLine(this)"></div>
+          <div><input type="text" inputmode="numeric" class="bCost" value="2,649" oninput="updateBundleLine(this)"></div>
+          <div class="bundle-subtotal">= <span class="bLineTotal">₦2,649</span></div>
+        </div>
+        <button type="button" class="remove-x" onclick="this.closest('.custom-row').remove(); calcBundle();">×</button>
       </div>
     </div>
-    <button type="button" onclick="openAddModalDirect('bundle','Add another item in bundle','Type item name and its true unit cost.')" style="background:#EAF6F1;color:#0F2A44">
-      + Add another item in this bundle
+    <button type="button" onclick="openStepModal('bundle')" style="background:#EAF6F1;color:#0F2A44">
+      + Add item into this bundle
     </button>
 
-    <h3>B. Discount / Promo Check</h3>
+    <h3>B. Discount / Markdown Check</h3>
     <label>Normal price before discount (<span class="cSym">₦</span>)</label>
     <input id="dSell" type="text" inputmode="numeric" value="3,350">
 
@@ -282,23 +317,107 @@
   </div>
 </main>
 
-<!-- ADD ITEM MODAL -->
-<div id="addModal" class="modal-backdrop" onclick="if(event.target===this)closeAddModal()">
+<!-- UNIVERSAL STEP-AWARE MODAL -->
+<div id="stepModal" class="modal-backdrop" onclick="if(event.target===this)closeStepModal()">
   <div class="modal">
     <div class="modal-head">
-      <b id="addModalTitle" style="font-size:17px;color:#0F2A44">Add another cost</b>
-      <button type="button" class="modal-close" onclick="closeAddModal()">×</button>
+      <b id="modalTitle" style="font-size:18px;color:#0F2A44">Add Cost</b>
+      <button type="button" class="modal-close" onclick="closeStepModal()">×</button>
     </div>
-    <p class="muted" id="addModalHint" style="margin:6px 0 12px"></p>
-    
-    <label>What is it called?</label>
-    <input id="addLabel" placeholder="e.g. Market levy">
+    <p class="muted" id="modalSubtitle" style="margin:4px 0 14px"></p>
 
-    <label>How much? (<span class="cSym">₦</span>)</label>
-    <input id="addValue" type="text" inputmode="numeric" placeholder="e.g. 100">
+    <!-- FORM FOR STEP 1: PRICE CALCULATOR (UNIT COST) -->
+    <div id="modalFormPrice" style="display:none">
+      <label>What is this expense called?</label>
+      <input id="pAddName" placeholder="e.g. Market levy, delivery runner, generator fuel">
 
-    <button type="button" onclick="confirmAdd()">Add to the form</button>
-    <button type="button" onclick="closeAddModal()" class="ghost" style="margin-top:8px">Cancel</button>
+      <label>How did you pay for this?</label>
+      <div class="segmented">
+        <button type="button" id="pModeDirect" class="active" onclick="setPriceCostMode('direct')">Direct for 1 unit</button>
+        <button type="button" id="pModeBatch" onclick="setPriceCostMode('batch')">Batch split across units</button>
+      </div>
+
+      <div id="pDirectFields">
+        <label>Amount for ONE unit (<span class="cSym">₦</span>)</label>
+        <input id="pAddUnitAmount" type="text" inputmode="numeric" placeholder="e.g. 50">
+      </div>
+
+      <div id="pBatchFields" style="display:none">
+        <label>Total amount paid for the whole batch (<span class="cSym">₦</span>)</label>
+        <input id="pAddBatchTotal" type="text" inputmode="numeric" placeholder="e.g. 2,000" oninput="updateBatchPreview()">
+        
+        <label>How many units did this batch produce / cover?</label>
+        <input id="pAddBatchCount" type="text" inputmode="numeric" placeholder="e.g. 40" oninput="updateBatchPreview()">
+
+        <div class="calc-preview-box">
+          Per-unit cost: <b id="pBatchCalcPreview">₦0</b> per unit
+          <div class="muted">We will add this exact per-unit cost to your product.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FORM FOR STEP 2: STARTUP COST ESTIMATOR (CAPITAL ITEM) -->
+    <div id="modalFormStartup" style="display:none">
+      <label>What startup thing do you need?</label>
+      <input id="sAddName" placeholder="e.g. Shop rent (6 months), CAC registration, Signboard">
+
+      <label>Category of expense</label>
+      <select id="sAddCategory">
+        <option value="Equipment">🛠️ Equipment &amp; Tools</option>
+        <option value="Space">🏪 Shop Space &amp; Premises</option>
+        <option value="Legal">📜 Legal, CAC &amp; Permits</option>
+        <option value="Stock">📦 Initial Stock &amp; Inventory</option>
+        <option value="Branding">🎨 Signboard &amp; Branding</option>
+        <option value="Other">💡 Other Startup Need</option>
+      </select>
+
+      <label>Estimated Cost (<span class="cSym">₦</span>)</label>
+      <input id="sAddAmount" type="text" inputmode="numeric" placeholder="e.g. 150,000">
+
+      <label>Is this essential for Day 1 launch?</label>
+      <div class="segmented">
+        <button type="button" id="sPriEssential" class="active" onclick="setStartupPriority('essential')">Day 1 Essential (Lean)</button>
+        <button type="button" id="sPriLater" onclick="setStartupPriority('later')">Can buy later (Proper)</button>
+      </div>
+      <div class="muted" id="sPriHint">Tick-marked by default. Unticking lets you see your leanest budget.</div>
+    </div>
+
+    <!-- FORM FOR STEP 3: BREAK-EVEN (MONTHLY OVERHEAD) -->
+    <div id="modalFormBreakeven" style="display:none">
+      <label>What ongoing monthly bill is this?</label>
+      <input id="beAddName" placeholder="e.g. Monthly shop rent, apprentice allowance, power">
+
+      <label>Monthly Amount (<span class="cSym">₦</span> / month)</label>
+      <input id="beAddAmount" type="text" inputmode="numeric" placeholder="e.g. 20,000">
+      
+      <div class="calc-preview-box">
+        We will tell you how many units you must sell every single month just to pay this bill!
+      </div>
+    </div>
+
+    <!-- FORM FOR STEP 4: BUNDLE CHECKER (ITEM IN COMBO) -->
+    <div id="modalFormBundle" style="display:none">
+      <label>Select from Saved Products (or add custom):</label>
+      <select id="bSavedSelect" onchange="onBundleSelectProduct()">
+        <option value="">-- Choose from your saved products --</option>
+      </select>
+
+      <label style="margin-top:10px">Item Name in this bundle</label>
+      <input id="bAddName" placeholder="e.g. Oloyin Beans 1kg, Special Gift Box">
+
+      <label>True Cost for ONE unit (<span class="cSym">₦</span>)</label>
+      <input id="bAddUnitCost" type="text" inputmode="numeric" placeholder="e.g. 2,579" oninput="updateBundlePreview()">
+
+      <label>Quantity of this item in bundle</label>
+      <input id="bAddQty" type="number" value="1" min="1" oninput="updateBundlePreview()">
+
+      <div class="calc-preview-box">
+        Total cost in bundle: <b id="bAddTotalPreview">₦0</b>
+      </div>
+    </div>
+
+    <button type="button" onclick="confirmStepAdd()" style="margin-top:16px">Add to the calculator</button>
+    <button type="button" onclick="closeStepModal()" class="ghost" style="margin-top:8px">Cancel</button>
   </div>
 </div>
 
@@ -332,6 +451,9 @@ function onCurrencyChange() {
   }
   renderSaved();
   if (window._last) calcPrice();
+  calcStartup();
+  calcBE();
+  calcBundle();
 }
 
 // STEP NAVIGATION
@@ -403,65 +525,365 @@ function finishFlow() {
   if (target) target.scrollIntoView({ behavior: "smooth" });
 }
 
-// CUSTOM ITEMS MODAL & SAFE DOM CREATION
-var _addTarget = "price";
-function openAddModalDirect(target, title, hint) {
-  _addTarget = target;
-  var m = document.getElementById("addModal");
+// -----------------------------------------------------------------------------
+// STEP-AWARE MODAL SYSTEM
+// -----------------------------------------------------------------------------
+var _activeModalTarget = "price";
+var _priceCostMode = "direct"; // direct | batch
+var _startupPriority = "essential"; // essential | later
+
+function openStepModal(target) {
+  _activeModalTarget = target;
+  var m = document.getElementById("stepModal");
   if (!m) return;
-  document.getElementById("addModalTitle").innerText = title;
-  document.getElementById("addModalHint").innerText = hint;
-  document.getElementById("addLabel").value = "";
-  document.getElementById("addValue").value = "";
+
+  // Hide all fieldsets
+  document.getElementById("modalFormPrice").style.display = "none";
+  document.getElementById("modalFormStartup").style.display = "none";
+  document.getElementById("modalFormBreakeven").style.display = "none";
+  document.getElementById("modalFormBundle").style.display = "none";
+
+  if (target === "price") {
+    document.getElementById("modalTitle").innerText = "Add Another Cost — For ONE Unit";
+    document.getElementById("modalSubtitle").innerText = "Include extra expenses (direct or batch) so they don't eat your profit.";
+    document.getElementById("pAddName").value = "";
+    document.getElementById("pAddUnitAmount").value = "";
+    document.getElementById("pAddBatchTotal").value = "";
+    document.getElementById("pAddBatchCount").value = "";
+    setPriceCostMode("direct");
+    document.getElementById("modalFormPrice").style.display = "block";
+  } else if (target === "startup") {
+    document.getElementById("modalTitle").innerText = "Add Startup Capital Need";
+    document.getElementById("modalSubtitle").innerText = "All one-time purchases before your very first sale.";
+    document.getElementById("sAddName").value = "";
+    document.getElementById("sAddAmount").value = "";
+    setStartupPriority("essential");
+    document.getElementById("modalFormStartup").style.display = "block";
+  } else if (target === "breakeven") {
+    document.getElementById("modalTitle").innerText = "Add Ongoing Monthly Running Cost";
+    document.getElementById("modalSubtitle").innerText = "Monthly bills (rent, staff, fuel) you must pay every month.";
+    document.getElementById("beAddName").value = "";
+    document.getElementById("beAddAmount").value = "";
+    document.getElementById("modalFormBreakeven").style.display = "block";
+  } else if (target === "bundle") {
+    document.getElementById("modalTitle").innerText = "Add Product / Item to Bundle";
+    document.getElementById("modalSubtitle").innerText = "Include a product with quantity and true unit cost.";
+    populateBundleSavedDropdown();
+    document.getElementById("bAddName").value = "";
+    document.getElementById("bAddUnitCost").value = "";
+    document.getElementById("bAddQty").value = "1";
+    updateBundlePreview();
+    document.getElementById("modalFormBundle").style.display = "block";
+  }
+
   m.classList.add("open");
 }
 
-function closeAddModal() {
-  var m = document.getElementById("addModal");
+function closeStepModal() {
+  var m = document.getElementById("stepModal");
   if (m) m.classList.remove("open");
 }
 
-function confirmAdd() {
-  var label = document.getElementById("addLabel").value.trim();
-  var val = parseNum(document.getElementById("addValue").value);
-  if (!label) { alert("Type a name first — e.g. Market levy"); return; }
-  if (val <= 0) { alert("Type an amount — e.g. 100"); return; }
+// STEP 1 MODAL HELPERS
+function setPriceCostMode(mode) {
+  _priceCostMode = mode;
+  var bDirect = document.getElementById("pModeDirect");
+  var bBatch = document.getElementById("pModeBatch");
+  var fDirect = document.getElementById("pDirectFields");
+  var fBatch = document.getElementById("pBatchFields");
 
-  var row = document.createElement("div");
-  row.className = "custom-row";
-
-  var lbl = document.createElement("label");
-  lbl.textContent = label;
-
-  var inp = document.createElement("input");
-  inp.type = "text";
-  inp.inputMode = "numeric";
-  inp.value = val.toLocaleString();
-
-  var btn = document.createElement("button");
-  btn.type = "button";
-  btn.className = "remove-x";
-  btn.textContent = "×";
-  btn.onclick = function() { row.remove(); };
-
-  row.appendChild(lbl);
-  row.appendChild(inp);
-  row.appendChild(btn);
-
-  if (_addTarget === "startup") {
-    inp.className = "sCostCustom";
-    document.getElementById("sCustom").appendChild(row);
-  } else if (_addTarget === "bundle") {
-    inp.className = "bCost";
-    document.getElementById("bItems").appendChild(row);
+  if (mode === "direct") {
+    bDirect.classList.add("active");
+    bBatch.classList.remove("active");
+    fDirect.style.display = "block";
+    fBatch.style.display = "none";
   } else {
-    inp.className = "pCost";
-    document.getElementById("pCustom").appendChild(row);
+    bDirect.classList.remove("active");
+    bBatch.classList.add("active");
+    fDirect.style.display = "none";
+    fBatch.style.display = "block";
+    updateBatchPreview();
   }
-  closeAddModal();
 }
 
+function updateBatchPreview() {
+  var total = parseNum(document.getElementById("pAddBatchTotal").value);
+  var count = Math.max(1, parseNum(document.getElementById("pAddBatchCount").value));
+  var perUnit = count > 0 ? (total / count) : 0;
+  document.getElementById("pBatchCalcPreview").innerText = fmt(perUnit);
+}
+
+// STEP 2 MODAL HELPERS
+function setStartupPriority(pri) {
+  _startupPriority = pri;
+  var bEss = document.getElementById("sPriEssential");
+  var bLat = document.getElementById("sPriLater");
+  var hint = document.getElementById("sPriHint");
+
+  if (pri === "essential") {
+    bEss.classList.add("active");
+    bLat.classList.remove("active");
+    hint.innerText = "Tick-marked for Day 1 launch (Lean Start).";
+  } else {
+    bEss.classList.remove("active");
+    bLat.classList.add("active");
+    hint.innerText = "Unchecked initially. Can buy later when profit arrives (Proper Start).";
+  }
+}
+
+// STEP 4 MODAL HELPERS
+function populateBundleSavedDropdown() {
+  var sel = document.getElementById("bSavedSelect");
+  if (!sel) return;
+  sel.innerHTML = "<option value=''>-- Choose from your saved products --</option>";
+  var a = [];
+  try { a = JSON.parse(localStorage.getItem("startwella:products:v1") || "[]"); } catch (e) { a = []; }
+  for (var i = 0; i < a.length; i++) {
+    var opt = document.createElement("option");
+    opt.value = i;
+    opt.textContent = a[i].name + " (True Cost: " + fmt(a[i].tc) + ")";
+    sel.appendChild(opt);
+  }
+}
+
+function onBundleSelectProduct() {
+  var sel = document.getElementById("bSavedSelect");
+  var idx = sel.value;
+  if (idx === "") return;
+  var a = JSON.parse(localStorage.getItem("startwella:products:v1") || "[]");
+  var prod = a[idx];
+  if (prod) {
+    document.getElementById("bAddName").value = prod.name;
+    document.getElementById("bAddUnitCost").value = Math.round(prod.tc).toLocaleString();
+    updateBundlePreview();
+  }
+}
+
+function updateBundlePreview() {
+  var cost = parseNum(document.getElementById("bAddUnitCost").value);
+  var qty = Math.max(1, parseNum(document.getElementById("bAddQty").value));
+  var lineTotal = cost * qty;
+  document.getElementById("bAddTotalPreview").innerText = fmt(lineTotal);
+}
+
+// CONFIRM ADD FOR ALL STEPS
+function confirmStepAdd() {
+  if (_activeModalTarget === "price") {
+    var name = document.getElementById("pAddName").value.trim();
+    if (!name) { alert("Please type what this cost is called (e.g. Market levy)."); return; }
+    
+    var unitCost = 0;
+    var badgeText = "";
+    if (_priceCostMode === "direct") {
+      unitCost = parseNum(document.getElementById("pAddUnitAmount").value);
+      if (unitCost <= 0) { alert("Please enter the amount for one unit."); return; }
+      badgeText = "Unit cost";
+    } else {
+      var batchTotal = parseNum(document.getElementById("pAddBatchTotal").value);
+      var batchCount = Math.max(1, parseNum(document.getElementById("pAddBatchCount").value));
+      if (batchTotal <= 0) { alert("Please enter total amount spent for the batch."); return; }
+      unitCost = Math.round((batchTotal / batchCount) * 100) / 100;
+      badgeText = "Batch: " + fmt(batchTotal) + " ÷ " + batchCount;
+    }
+
+    var row = document.createElement("div");
+    row.className = "custom-row";
+
+    var lbl = document.createElement("label");
+    lbl.textContent = name + " ";
+    var badge = document.createElement("span");
+    badge.className = "badge";
+    badge.textContent = badgeText;
+    lbl.appendChild(badge);
+
+    var inp = document.createElement("input");
+    inp.type = "text";
+    inp.inputMode = "numeric";
+    inp.className = "pCost";
+    inp.value = unitCost.toLocaleString();
+    inp.oninput = function() { calcPrice(); };
+
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "remove-x";
+    btn.textContent = "×";
+    btn.onclick = function() { row.remove(); calcPrice(); };
+
+    row.appendChild(lbl);
+    row.appendChild(inp);
+    row.appendChild(btn);
+
+    document.getElementById("pCustom").appendChild(row);
+    closeStepModal();
+    calcPrice();
+
+  } else if (_activeModalTarget === "startup") {
+    var sName = document.getElementById("sAddName").value.trim();
+    var sCat = document.getElementById("sAddCategory").value;
+    var sAmt = parseNum(document.getElementById("sAddAmount").value);
+    if (!sName) { alert("Please type the startup item name (e.g. Shop rent)."); return; }
+    if (sAmt <= 0) { alert("Please enter the estimated cost."); return; }
+
+    var isChecked = (_startupPriority === "essential");
+    var sRow = document.createElement("div");
+    sRow.className = "custom-row";
+
+    var sLbl = document.createElement("label");
+    var cb = document.createElement("input");
+    cb.type = "checkbox";
+    cb.className = "sCheck";
+    cb.checked = isChecked;
+    cb.style.width = "18px";
+    cb.style.height = "18px";
+    cb.style.marginRight = "8px";
+    cb.style.verticalAlign = "middle";
+    cb.onchange = function() { calcStartup(); };
+
+    sLbl.appendChild(cb);
+    sLbl.appendChild(document.createTextNode(sName + " "));
+
+    var cBadge = document.createElement("span");
+    cBadge.className = "badge badge-blue";
+    cBadge.textContent = sCat;
+    sLbl.appendChild(cBadge);
+
+    if (isChecked) {
+      var pBadge = document.createElement("span");
+      pBadge.className = "badge";
+      pBadge.textContent = "Day 1 Lean";
+      sLbl.appendChild(pBadge);
+    }
+
+    var sInp = document.createElement("input");
+    sInp.type = "text";
+    sInp.inputMode = "numeric";
+    sInp.className = "sCost";
+    sInp.value = sAmt.toLocaleString();
+    sInp.oninput = function() { calcStartup(); };
+
+    var sBtn = document.createElement("button");
+    sBtn.type = "button";
+    sBtn.className = "remove-x";
+    sBtn.textContent = "×";
+    sBtn.onclick = function() { sRow.remove(); calcStartup(); };
+
+    sRow.appendChild(sLbl);
+    sRow.appendChild(sInp);
+    sRow.appendChild(sBtn);
+
+    document.getElementById("sCustom").appendChild(sRow);
+    closeStepModal();
+    calcStartup();
+
+  } else if (_activeModalTarget === "breakeven") {
+    var beName = document.getElementById("beAddName").value.trim();
+    var beAmt = parseNum(document.getElementById("beAddAmount").value);
+    if (!beName) { alert("Please name this ongoing monthly bill."); return; }
+    if (beAmt <= 0) { alert("Please enter the monthly amount."); return; }
+
+    var beRow = document.createElement("div");
+    beRow.className = "custom-row";
+
+    var beLbl = document.createElement("label");
+    beLbl.textContent = beName + " ";
+    var beBadge = document.createElement("span");
+    beBadge.className = "badge badge-warn";
+    beBadge.textContent = "Monthly overhead";
+    beLbl.appendChild(beBadge);
+
+    var beInp = document.createElement("input");
+    beInp.type = "text";
+    beInp.inputMode = "numeric";
+    beInp.className = "beOverheadCost";
+    beInp.value = beAmt.toLocaleString();
+    beInp.oninput = function() { calcBE(); };
+
+    var beBtn = document.createElement("button");
+    beBtn.type = "button";
+    beBtn.className = "remove-x";
+    beBtn.textContent = "×";
+    beBtn.onclick = function() { beRow.remove(); calcBE(); };
+
+    beRow.appendChild(beLbl);
+    beRow.appendChild(beInp);
+    beRow.appendChild(beBtn);
+
+    document.getElementById("beMonthly").appendChild(beRow);
+    closeStepModal();
+    calcBE();
+
+  } else if (_activeModalTarget === "bundle") {
+    var bName = document.getElementById("bAddName").value.trim();
+    var bUnitCost = parseNum(document.getElementById("bAddUnitCost").value);
+    var bQty = Math.max(1, parseNum(document.getElementById("bAddQty").value));
+    if (!bName) { alert("Please specify the item name."); return; }
+    if (bUnitCost <= 0) { alert("Please enter the unit true cost."); return; }
+
+    var bRow = document.createElement("div");
+    bRow.className = "custom-row";
+    bRow.setAttribute("data-name", bName);
+
+    var bLbl = document.createElement("label");
+    bLbl.textContent = bName;
+
+    var grid = document.createElement("div");
+    grid.className = "bundle-grid";
+
+    var qDiv = document.createElement("div");
+    var qInp = document.createElement("input");
+    qInp.type = "number";
+    qInp.className = "bQty";
+    qInp.value = bQty;
+    qInp.min = "1";
+    qInp.oninput = function() { updateBundleLine(this); };
+    qDiv.appendChild(qInp);
+
+    var cDiv = document.createElement("div");
+    var cInp = document.createElement("input");
+    cInp.type = "text";
+    cInp.inputMode = "numeric";
+    cInp.className = "bCost";
+    cInp.value = bUnitCost.toLocaleString();
+    cInp.oninput = function() { updateBundleLine(this); };
+    cDiv.appendChild(cInp);
+
+    var tDiv = document.createElement("div");
+    tDiv.className = "bundle-subtotal";
+    tDiv.innerHTML = "= <span class='bLineTotal'>" + fmt(bUnitCost * bQty) + "</span>";
+
+    grid.appendChild(qDiv);
+    grid.appendChild(cDiv);
+    grid.appendChild(tDiv);
+
+    var bBtn = document.createElement("button");
+    bBtn.type = "button";
+    bBtn.className = "remove-x";
+    bBtn.textContent = "×";
+    bBtn.onclick = function() { bRow.remove(); calcBundle(); };
+
+    bRow.appendChild(bLbl);
+    bRow.appendChild(grid);
+    bRow.appendChild(bBtn);
+
+    document.getElementById("bItems").appendChild(bRow);
+    closeStepModal();
+    calcBundle();
+  }
+}
+
+function updateBundleLine(inputEl) {
+  var row = inputEl.closest(".custom-row");
+  if (!row) return;
+  var qty = Math.max(1, parseNum(row.querySelector(".bQty").value));
+  var cost = parseNum(row.querySelector(".bCost").value);
+  var lineTotalEl = row.querySelector(".bLineTotal");
+  if (lineTotalEl) lineTotalEl.innerText = fmt(qty * cost);
+  calcBundle();
+}
+
+// -----------------------------------------------------------------------------
 // 1. PRICE CALCULATOR LOGIC
+// -----------------------------------------------------------------------------
 function calcPrice() {
   var b = parseNum(document.getElementById("bulk").value);
   var t = parseNum(document.getElementById("trans").value);
@@ -476,7 +898,7 @@ function calcPrice() {
     var lblText = rows[i].querySelector("label") ? rows[i].querySelector("label").textContent : "Other";
     var amt = parseNum(rows[i].querySelector(".pCost").value);
     custom += amt;
-    if (amt > 0) lines.push(lblText + " (" + fmt(amt) + ")");
+    if (amt > 0) lines.push(lblText.trim() + " (" + fmt(amt) + ")");
   }
 
   var spent = b + t + pk + l + custom;
@@ -515,6 +937,11 @@ function calcPrice() {
   // Pre-fill next calculators with current findings
   var beProf = document.getElementById("beProfit");
   if (beProf && prof > 0) beProf.value = Math.round(prof);
+
+  var dCost = document.getElementById("dCost");
+  if (dCost) dCost.value = Math.round(tc).toLocaleString();
+  var dSell = document.getElementById("dSell");
+  if (dSell) dSell.value = Math.round(sell).toLocaleString();
 }
 
 function shareWA() {
@@ -623,7 +1050,9 @@ function exportPDF() {
   window.print();
 }
 
-// 2. STARTUP COST TEMPLATES
+// -----------------------------------------------------------------------------
+// 2. STARTUP COST TEMPLATES & LOGIC
+// -----------------------------------------------------------------------------
 var TEMPLATES = {
   foodstuff: [
     ["First stock — 2 bags of rice/beans/pepper", "Initial wholesale goods to sell first", 160000],
@@ -663,36 +1092,32 @@ function loadTmpl() {
   var list = TEMPLATES[key] || TEMPLATES.foodstuff;
   var h = "";
   for (var i = 0; i < list.length; i++) {
-    h += "<div style='margin:12px 0'>" +
-      "<label><input type='checkbox' checked style='width:18px;height:18px;margin-right:8px;vertical-align:middle'> " + list[i][0] + "</label>" +
+    h += "<div class='custom-row' style='background:#fff'>" +
+      "<label><input type='checkbox' checked class='sCheck' onchange='calcStartup()' style='width:18px;height:18px;margin-right:8px;vertical-align:middle'> " + list[i][0] + "</label>" +
       "<div class='muted'>" + list[i][1] + "</div>" +
-      "<input type='text' inputmode='numeric' class='sCost' value='" + list[i][2].toLocaleString() + "' style='margin-top:6px'>" +
+      "<input type='text' inputmode='numeric' class='sCost' value='" + list[i][2].toLocaleString() + "' style='margin-top:6px' oninput='calcStartup()'>" +
     "</div>";
   }
   document.getElementById("sItems").innerHTML = h;
+  calcStartup();
 }
 
 function calcStartup() {
   var total = 0;
-  var rows = document.querySelectorAll("#sItems > div");
+  var allItemsTotal = 0;
+  var rows = document.querySelectorAll("#sItems > div, #sCustom > div");
   var lines = [];
+
   for (var i = 0; i < rows.length; i++) {
     var cb = rows[i].querySelector("input[type=checkbox]");
     var amt = parseNum(rows[i].querySelector(".sCost").value);
-    var label = rows[i].querySelector("label").textContent;
+    allItemsTotal += amt;
+    var labelEl = rows[i].querySelector("label");
+    var labelText = labelEl ? labelEl.textContent : "Item";
+
     if (cb && cb.checked) {
       total += amt;
-      lines.push(label.trim() + " (" + fmt(amt) + ")");
-    }
-  }
-
-  var crows = document.querySelectorAll("#sCustom > div");
-  for (var j = 0; j < crows.length; j++) {
-    var nm = crows[j].querySelector("label") ? crows[j].querySelector("label").textContent : "Other";
-    var camt = parseNum(crows[j].querySelector(".sCostCustom").value);
-    if (camt > 0) {
-      total += camt;
-      lines.push(nm.trim() + " (" + fmt(camt) + ")");
+      lines.push(labelText.trim() + " (" + fmt(amt) + ")");
     }
   }
 
@@ -703,7 +1128,8 @@ function calcStartup() {
   document.getElementById("startupOut").innerHTML =
     "<div class='result-card'>" +
       "<h3>You need " + fmt(grand) + " to start</h3>" +
-      "<p>Items added: <b>" + fmt(total) + "</b>. Extra for surprises (" + pct + "%): <b>" + fmt(cont) + "</b>.</p>" +
+      "<p>Checked items: <b>" + fmt(total) + "</b>. Extra for surprises (" + pct + "%): <b>" + fmt(cont) + "</b>.</p>" +
+      "<p class='muted'>Lean Day 1 budget: " + fmt(grand) + " | Full wish-list budget: " + fmt(allItemsTotal * (1 + pct / 100)) + "</p>" +
     "</div>" +
     "<div class='next-action'><b>Next Step:</b> Go to Calculator 3 to see how many units you must sell to recover this " + fmt(grand) + ".</div>";
 
@@ -712,38 +1138,62 @@ function calcStartup() {
   if (beStart) beStart.value = grand.toLocaleString();
 }
 
-// 3. BREAK-EVEN LOGIC
+// -----------------------------------------------------------------------------
+// 3. BREAK-EVEN LOGIC (STARTUP + MONTHLY OVERHEAD)
+// -----------------------------------------------------------------------------
 function calcBE() {
   var start = parseNum(document.getElementById("beStart").value);
   var prof = parseNum(document.getElementById("beProfit").value);
   var perWeek = Math.max(1, parseNum(document.getElementById("beWeek").value));
 
+  // Sum monthly ongoing running costs
+  var monthlyOverhead = 0;
+  var overheadRows = document.querySelectorAll("#beMonthly .beOverheadCost");
+  for (var i = 0; i < overheadRows.length; i++) {
+    monthlyOverhead += parseNum(overheadRows[i].value);
+  }
+
   if (prof <= 0) {
     document.getElementById("beOut").innerHTML =
-      "<div class='loss-banner'>You keep " + fmt(prof) + " from each sale. You will never recover your starting money. Raise your price in Calculator 1 first.</div>";
+      "<div class='loss-banner'>You keep " + fmt(prof) + " from each sale. You will never recover your starting money or pay your bills. Raise your price in Calculator 1 first.</div>";
     return;
   }
 
   var units = Math.ceil(start / prof);
   var weeks = Math.ceil(units / perWeek);
+  var monthlyUnits = monthlyOverhead > 0 ? Math.ceil(monthlyOverhead / prof) : 0;
+
+  var monthlyNotice = monthlyOverhead > 0
+    ? "<p style='margin-top:8px;border-top:1px dashed #BFE8CD;padding-top:8px'><b>Monthly Overhead:</b> You have " + fmt(monthlyOverhead) + "/mo in ongoing bills. You must sell <b>" + monthlyUnits + " units EVERY MONTH</b> just to keep the business open!</p>"
+    : "";
 
   document.getElementById("beOut").innerHTML =
     "<div class='result-card'>" +
       "<h3>Sell " + units + " units in about " + weeks + " weeks</h3>" +
       "<p>Starting capital: <b>" + fmt(start) + "</b>. Profit per sale: <b>" + fmt(prof) + "</b>.<br>" +
       fmt(start) + " ÷ " + fmt(prof) + " = <b>" + units + " sales</b> needed to break even.</p>" +
+      monthlyNotice +
     "</div>" +
     "<div class='next-action'><b>Next Step:</b> If " + weeks + " weeks is too long, raise your price slightly or start with a leaner budget in Calculator 2.</div>";
 }
 
-// 4. BUNDLE & DISCOUNT LOGIC
+// -----------------------------------------------------------------------------
+// 4. BUNDLE & DISCOUNT LOGIC (WITH QUANTITIES)
+// -----------------------------------------------------------------------------
 function calcBundle() {
   var bp = parseNum(document.getElementById("bPrice").value);
   var sum = 0;
-  var costs = document.querySelectorAll(".bCost");
-  for (var i = 0; i < costs.length; i++) {
-    sum += parseNum(costs[i].value);
+  var rows = document.querySelectorAll("#bItems .custom-row");
+
+  for (var i = 0; i < rows.length; i++) {
+    var qty = Math.max(1, parseNum(rows[i].querySelector(".bQty") ? rows[i].querySelector(".bQty").value : 1));
+    var cost = parseNum(rows[i].querySelector(".bCost") ? rows[i].querySelector(".bCost").value : 0);
+    var lineTotal = qty * cost;
+    sum += lineTotal;
+    var ltSpan = rows[i].querySelector(".bLineTotal");
+    if (ltSpan) ltSpan.innerText = fmt(lineTotal);
   }
+
   var bundleProf = bp - sum;
 
   var dSell = parseNum(document.getElementById("dSell").value);
@@ -760,17 +1210,17 @@ function calcBundle() {
   var dProf = dPrice - dCost;
 
   var bBanner = bundleProf < 0
-    ? "<div class='loss-banner'>BUNDLE LOSS — This bundle loses " + fmt(Math.abs(bundleProf)) + ". Raise the bundle price to at least " + fmt(sum) + ".</div>"
-    : "<div class='safe-banner'>BUNDLE SAFE — This bundle keeps " + fmt(bundleProf) + " in profit.</div>";
+    ? "<div class='loss-banner'>BUNDLE LOSS — This combo loses " + fmt(Math.abs(bundleProf)) + ". Total items cost " + fmt(sum) + ". Raise bundle price to at least " + fmt(sum) + "!</div>"
+    : "<div class='safe-banner'>BUNDLE SAFE — This combo keeps " + fmt(bundleProf) + " in profit. (Total cost: " + fmt(sum) + ").</div>";
 
   var dBanner = dProf < 0
-    ? "<div class='loss-banner'>DISCOUNT LOSS — After " + dPct + "% off, you lose " + fmt(Math.abs(dProf)) + " per unit. Lower your discount!</div>"
-    : "<div class='safe-banner'>DISCOUNT SAFE — After " + dPct + "% off, you still keep " + fmt(dProf) + " profit per unit.</div>";
+    ? "<div class='loss-banner'>DISCOUNT LOSS — After " + dPct + "% off (" + fmt(dPrice) + "), you lose " + fmt(Math.abs(dProf)) + " per unit below cost (" + fmt(dCost) + "). Lower discount!</div>"
+    : "<div class='safe-banner'>DISCOUNT SAFE — After " + dPct + "% off (" + fmt(dPrice) + "), you still keep " + fmt(dProf) + " profit per unit.</div>";
 
   document.getElementById("bundleOut").innerHTML =
     "<div class='result-card'>" +
-      "<h3>Bundle: " + fmt(bp) + " (Cost: " + fmt(sum) + ")</h3>" +
-      "<p>Discount: " + fmt(dPrice) + " after " + dPct + "% off (Cost: " + fmt(dCost) + ").</p>" +
+      "<h3>Bundle: Charge " + fmt(bp) + " (Items Cost: " + fmt(sum) + ")</h3>" +
+      "<p>Discount: Charge " + fmt(dPrice) + " after " + dPct + "% off (Cost: " + fmt(dCost) + ").</p>" +
     "</div>" + bBanner + dBanner;
 }
 

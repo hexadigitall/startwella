@@ -48,7 +48,12 @@ StartWella speaks like a wise, supportive business mentor who explains numbers o
     - *Helper text:* Pay someone, or pay yourself. Never work for free.
   - `Custom Unit Costs`
     - *Button:* `+ Add another cost for ONE unit`
-    - *Examples:* Market levy, generator fuel, plastic spoon, branding ribbon.
+    - *Modal Behavior & Fields:*
+      - Cost description/name (e.g. Market ticket, delivery runner, fuel)
+      - Payment Mode Toggle:
+        - Mode 1: *Direct cost for 1 unit* $\rightarrow$ amount per unit.
+        - Mode 2: *Batch/shared expense* $\rightarrow$ total spent $\div$ units covered $\rightarrow$ calculates exact unit cost automatically!
+    - *Row on Form:* Editable unit cost input, badge explaining batch division (e.g. `Batch: ₦2,000 ÷ 40`), and delete button.
   - `Waste Percentage`
     - *Label:* How much is lost when you clean / sort it? (out of 100)
     - *Helper text:* If you buy 100kg and only 95kg is good, type 5. If nothing lost, type 0.
@@ -81,7 +86,14 @@ StartWella speaks like a wise, supportive business mentor who explains numbers o
 - **Fields:**
   - `Business Template Selector:` Choose what kind of business you are starting.
   - `Checklist of Initial Startup Needs:` Pre-filled checkboxes with items, explainers, and cost inputs.
-  - `Custom Startup Items:` Add custom one-time expenses (rent, licenses, equipment).
+  - `Custom Startup Items:`
+    - *Button:* `+ Add another thing I need to start`
+    - *Modal Behavior & Fields:*
+      - Item Name (e.g., Shop rent 6 months, CAC registration, Display showcase)
+      - Category: Equipment & Tools, Space & Premises, Legal & CAC, Initial Stock, Branding, Other
+      - Estimated Amount (₦)
+      - Priority: *Day 1 Essential (Lean Start)* vs *Can buy later (Proper Start)*
+    - *Row on Form:* Interactive checklist row with working checkbox, category badge, editable amount, and delete button. Unticking any item recalculates the Lean Start budget.
   - `Surprise Buffer (Contingency %):`
     - *Label:* Extra money for surprises — in %
     - *Helper text:* Prices go up. A bag tears. Type 5 for ₦5 extra per ₦100.
@@ -102,6 +114,11 @@ StartWella speaks like a wise, supportive business mentor who explains numbers o
   - `Total Money Spent to Start (₦):` Auto-populated from Calculator 2 or entered manually.
   - `Money You Keep from ONE Sale (₦):` Auto-populated from Calculator 1 profit or entered manually.
   - `Expected Sales per Week:` Realistic estimate of units sold weekly.
+  - `Ongoing Monthly Running Overheads (Optional):`
+    - *Button:* `+ Add ongoing monthly running cost (Rent, light, salary)`
+    - *Modal Fields:* Bill name (e.g. monthly rent, apprentice salary) and monthly amount.
+    - *Row on Form:* Itemized overhead row with editable cost and delete button.
+    - *Outcome:* Calculates both **Startup Recovery Timeline** (`X units in Y weeks`) and **Monthly Survival Target** (`Must sell Z units EVERY MONTH to cover ongoing overheads`).
 - **Buttons:**
   - Primary: `When will I break even?`
   - Next: `Next: Will this offer lose me money? →`
@@ -119,8 +136,16 @@ StartWella speaks like a wise, supportive business mentor who explains numbers o
 - **Subtitle:** `Never offer a combo promo or discount that quietly wipes out your profit.`
 - **Part A: Bundle / Combo Checker:**
   - `Bundle Selling Price (₦)`
-  - `Item True Costs in Bundle (₦):` Item 1 + Item 2 + Item 3...
-  - *Outcome:* `SAFE: Bundle keeps [Profit]` OR `LOSS: Bundle loses [Loss]. Do not sell at [Bundle Price]. Raise bundle price to at least [Sum Costs].`
+  - `Items Included in Bundle:`
+    - *Button:* `+ Add item into this bundle`
+    - *Modal Behavior & Fields:*
+      - Option to select from **Saved Products** (auto-populates name and true unit cost) or type a custom item.
+      - Item Name (e.g. Oloyin 1kg, Special luxury box)
+      - True unit cost (₦)
+      - **Quantity in bundle** (e.g. 2, 3...)
+      - Live Line Total preview (`Quantity × Unit Cost`)
+    - *Row on Form:* Item row with quantity input, unit cost input, line total display (`= ₦X`), and delete button.
+  - *Outcome:* `SAFE: Bundle keeps [Profit]` OR `LOSS: Bundle loses [Loss]. Raise bundle price to at least [Sum Costs].`
 - **Part B: Discount Checker:**
   - `Normal Price Before Discount (₦)`
   - `True Cost of ONE Unit (₦)`

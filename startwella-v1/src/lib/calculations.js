@@ -162,14 +162,47 @@ export function breakEvenWeeks(units, unitsPerWeek) {
 }
 
 /**
+ * Converts a batch/shared expense into a per-unit cost.
+ * @param {number} totalPaid - Total expense for the batch
+ * @param {number} batchUnits - Total units covered by this expense
+ * @returns {number}
+ */
+export function batchToUnitCost(totalPaid, batchUnits) {
+  const tot = Math.max(0, parseNumber(totalPaid));
+  const units = Math.max(1, parseNumber(batchUnits));
+  return Math.round((tot / units) * 100) / 100;
+}
+
+/**
+ * Units needed per month to cover ongoing monthly fixed costs/overheads.
+ * @param {number} monthlyOverhead - Monthly rent, salaries, utilities
+ * @param {number} profitPerUnitVal - Profit per unit sold
+ * @returns {number}
+ */
+export function monthlyBreakEvenUnits(monthlyOverhead, profitPerUnitVal) {
+  const o = Math.max(0, parseNumber(monthlyOverhead));
+  const p = parseNumber(profitPerUnitVal);
+  if (p <= 0) return Infinity;
+  return Math.ceil(o / p);
+}
+
+/**
  * Evaluates whether a multi-item bundle is profitable.
+ * Supports both an array of numbers [2579, 2649] and item objects [{ unitCost, qty }].
  * @param {number} bundlePrice 
- * @param {number[]} itemTrueCosts 
+ * @param {Array<number|{ unitCost?: number, cost?: number, qty?: number, quantity?: number }>} itemTrueCosts 
  * @returns {{ cost: number, profit: number, isLoss: boolean, isSafe: boolean }}
  */
 export function bundleCheck(bundlePrice, itemTrueCosts = []) {
   const bp = parseNumber(bundlePrice);
-  const cost = itemTrueCosts.reduce((acc, c) => acc + Math.max(0, parseNumber(c)), 0);
+  const cost = itemTrueCosts.reduce((acc, item) => {
+    if (typeof item === 'object' && item !== null) {
+      const uCost = Math.max(0, parseNumber(item.unitCost ?? item.cost));
+      const qty = Math.max(1, parseNumber(item.qty ?? item.quantity ?? 1));
+      return acc + (uCost * qty);
+    }
+    return acc + Math.max(0, parseNumber(item));
+  }, 0);
   const profit = bp - cost;
   return {
     cost,
