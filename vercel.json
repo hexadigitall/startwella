@@ -1,0 +1,34 @@
+{
+  "version": 2,
+  "public": true,
+  "cleanUrls": true,
+  "routes": [
+    {
+      "src": "/manifest.json",
+      "dest": "/startwella-v1/manifest.json"
+    },
+    {
+      "src": "/sw.js",
+      "dest": "/startwella-v1/sw.js",
+      "headers": {
+        "cache-control": "public, max-age=0, must-revalidate"
+      }
+    },
+    {
+      "src": "/assets/(.*)",
+      "dest": "/startwella-v1/assets/$1"
+    },
+    {
+      "src": "/src/(.*)",
+      "dest": "/startwella-v1/src/$1"
+    },
+    {
+      "src": "/",
+      "dest": "/startwella-v1/index.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/startwella-v1/$1"
+    }
+  ]
+}
