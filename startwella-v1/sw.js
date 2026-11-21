@@ -1,5 +1,5 @@
 // StartWella Service Worker — Network-First with Immediate Cache Eviction
-const CACHE_VERSION = 'startwella-v1.0.3-20261121';
+const CACHE_VERSION = 'startwella-v1.0.4-20261121';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();

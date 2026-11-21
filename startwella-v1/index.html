@@ -16,7 +16,7 @@
     if ('caches' in window) {
       caches.keys().then(function(keys) {
         keys.forEach(function(k) {
-          if (k !== 'startwella-v1.0.3-20261121') caches.delete(k);
+          if (k !== 'startwella-v1.0.4-20261121') caches.delete(k);
         });
       });
     }
@@ -116,6 +116,45 @@
     .calc-preview-box { background: #EAF6F1; border: 1px solid #BFE8CD; border-radius: 10px; padding: 12px; margin: 12px 0; font-size: 13px; color: #0F2A44; }
     .calc-preview-box b { font-size: 15px; color: #0EA47A; }
 
+    .calc-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      background: #EAF6F1;
+      color: #0EA47A;
+      border: 1px solid #BFE8CD;
+      border-radius: 99px;
+      padding: 4px 11px;
+      margin-bottom: 12px;
+    }
+    .recalc-notice {
+      background: #FFF7E6;
+      border: 1px dashed #F5D98A;
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 12px;
+      font-size: 13px;
+      line-height: 1.4;
+      color: #7A4B00;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      animation: fadeIn 0.25s ease-out;
+    }
+    .calc-pulse {
+      animation: calcPulse 0.35s ease-out;
+    }
+    @keyframes calcPulse {
+      0% { transform: scale(0.985); opacity: 0.7; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     .actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
     .actions-grid button { margin-top: 0; }
 
@@ -131,7 +170,7 @@
 
 <header>
   <div>
-    <div class="brand-title">StartWella <span class="version-tag" onclick="forceAppRefresh()" title="Click to clear cache and reload latest version">v1.0.3 ⟳</span></div>
+    <div class="brand-title">StartWella <span class="version-tag" onclick="forceAppRefresh()" title="Click to clear cache and reload latest version">v1.0.4 ⟳</span></div>
     <div class="brand-sub">Start well. Price right. Grow steady.</div>
   </div>
   <div>
@@ -291,7 +330,7 @@
           <div><input type="text" inputmode="numeric" class="bCost" value="2,579" oninput="updateBundleLine(this)"></div>
           <div class="bundle-subtotal">= <span class="bLineTotal">₦2,579</span></div>
         </div>
-        <button type="button" class="remove-x" onclick="this.closest('.custom-row').remove(); calcBundle();">×</button>
+        <button type="button" class="remove-x" onclick="this.closest('.custom-row').remove(); markStale('bundle');">×</button>
       </div>
       <div class="custom-row" data-name="Rice 1kg">
         <label>Rice 1kg</label>
@@ -300,7 +339,7 @@
           <div><input type="text" inputmode="numeric" class="bCost" value="2,649" oninput="updateBundleLine(this)"></div>
           <div class="bundle-subtotal">= <span class="bLineTotal">₦2,649</span></div>
         </div>
-        <button type="button" class="remove-x" onclick="this.closest('.custom-row').remove(); calcBundle();">×</button>
+        <button type="button" class="remove-x" onclick="this.closest('.custom-row').remove(); markStale('bundle');">×</button>
       </div>
     </div>
     <button type="button" onclick="openStepModal('bundle')" style="background:#EAF6F1;color:#0F2A44">
@@ -309,13 +348,13 @@
 
     <h3>B. Discount / Markdown Check</h3>
     <label>Normal price before discount (<span class="cSym">₦</span>)</label>
-    <input id="dSell" type="text" inputmode="numeric" value="3,350" oninput="calcBundle()">
+    <input id="dSell" type="text" inputmode="numeric" value="3,350" oninput="markStale('bundle')">
 
     <label>True cost of ONE unit (<span class="cSym">₦</span>)</label>
-    <input id="dCost" type="text" inputmode="numeric" value="2,579" oninput="calcBundle()">
+    <input id="dCost" type="text" inputmode="numeric" value="2,579" oninput="markStale('bundle')">
 
     <label>Discount you want to give (%)</label>
-    <input id="dPct" type="text" inputmode="numeric" value="10" oninput="calcBundle()">
+    <input id="dPct" type="text" inputmode="numeric" value="10" oninput="markStale('bundle')">
 
     <button type="button" onclick="calcBundle()">Check my bundle &amp; discount</button>
     <div id="bundleOut"></div>
@@ -348,7 +387,7 @@
   <div class="muted" style="text-align:center;padding:12px;font-size:11px">
     StartWella provides mathematical estimates for educational and operational planning purposes.
     Verify supplier prices and local costs before making business commitments.
-    <div style="margin-top:6px;font-weight:700;color:#0F2A44">StartWella v1.0.3 • Dynamic Step-Specific Add Forms (Zero Generic Placeholders)</div>
+    <div style="margin-top:6px;font-weight:700;color:#0F2A44">StartWella v1.0.4 • On-Demand Calculation with Instant Confirmation Badges</div>
   </div>
 </main>
 
@@ -514,6 +553,39 @@ function fmt(n) {
   return sym + num.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
+// STATE TRACKING FOR ON-DEMAND USER CALCULATION
+var _calculated = {
+  price: false,
+  startup: false,
+  breakeven: false,
+  bundle: false
+};
+
+function markStale(step) {
+  if (!_calculated[step]) return;
+  var outMap = {
+    price: "priceOut",
+    startup: "startupOut",
+    breakeven: "beOut",
+    bundle: "bundleOut"
+  };
+  var btnTextMap = {
+    price: "Calculate my price",
+    startup: "Add up — how much do I need?",
+    breakeven: "When will I break even?",
+    bundle: "Check my bundle & discount"
+  };
+  var outEl = document.getElementById(outMap[step]);
+  if (!outEl || !outEl.innerHTML.trim()) return;
+
+  if (!outEl.querySelector(".recalc-notice")) {
+    var notice = document.createElement("div");
+    notice.className = "recalc-notice";
+    notice.innerHTML = "<span>⚠️</span><div><b>Numbers changed.</b> Tap <b>\"" + btnTextMap[step] + "\"</b> to refresh your figures.</div>";
+    outEl.insertBefore(notice, outEl.firstChild);
+  }
+}
+
 function onCurrencyChange() {
   _curr = document.getElementById("currSelect").value;
   var syms = document.querySelectorAll(".cSym");
@@ -521,10 +593,10 @@ function onCurrencyChange() {
     syms[i].innerText = CURR_SYMBOLS[_curr] || "₦";
   }
   renderSaved();
-  if (window._last) calcPrice();
-  calcStartup();
-  calcBE();
-  calcBundle();
+  if (_calculated.price) calcPrice();
+  if (_calculated.startup) calcStartup();
+  if (_calculated.breakeven) calcBE();
+  if (_calculated.bundle) calcBundle();
 }
 
 // STEP NAVIGATION
@@ -885,13 +957,13 @@ function confirmStepAdd() {
     inp.inputMode = "numeric";
     inp.className = "pCost";
     inp.value = unitCost.toLocaleString();
-    inp.oninput = function() { calcPrice(); };
+    inp.oninput = function() { markStale('price'); };
 
     var btn = document.createElement("button");
     btn.type = "button";
     btn.className = "remove-x";
     btn.textContent = "×";
-    btn.onclick = function() { row.remove(); calcPrice(); };
+    btn.onclick = function() { row.remove(); markStale('price'); };
 
     row.appendChild(lbl);
     row.appendChild(inp);
@@ -899,7 +971,7 @@ function confirmStepAdd() {
 
     document.getElementById("pCustom").appendChild(row);
     closeStepModal();
-    calcPrice();
+    markStale('price');
 
   } else if (_activeModalTarget === "startup") {
     var sName = document.getElementById("sAddName").value.trim();
@@ -921,7 +993,7 @@ function confirmStepAdd() {
     cb.style.height = "18px";
     cb.style.marginRight = "8px";
     cb.style.verticalAlign = "middle";
-    cb.onchange = function() { calcStartup(); };
+    cb.onchange = function() { markStale('startup'); };
 
     sLbl.appendChild(cb);
     sLbl.appendChild(document.createTextNode(sName + " "));
@@ -943,13 +1015,13 @@ function confirmStepAdd() {
     sInp.inputMode = "numeric";
     sInp.className = "sCost";
     sInp.value = sAmt.toLocaleString();
-    sInp.oninput = function() { calcStartup(); };
+    sInp.oninput = function() { markStale('startup'); };
 
     var sBtn = document.createElement("button");
     sBtn.type = "button";
     sBtn.className = "remove-x";
     sBtn.textContent = "×";
-    sBtn.onclick = function() { sRow.remove(); calcStartup(); };
+    sBtn.onclick = function() { sRow.remove(); markStale('startup'); };
 
     sRow.appendChild(sLbl);
     sRow.appendChild(sInp);
@@ -957,7 +1029,7 @@ function confirmStepAdd() {
 
     document.getElementById("sCustom").appendChild(sRow);
     closeStepModal();
-    calcStartup();
+    markStale('startup');
 
   } else if (_activeModalTarget === "breakeven") {
     var beName = document.getElementById("beAddName").value.trim();
@@ -983,13 +1055,13 @@ function confirmStepAdd() {
     beInp.inputMode = "numeric";
     beInp.className = "beOverheadCost";
     beInp.value = beAmt.toLocaleString();
-    beInp.oninput = function() { calcBE(); };
+    beInp.oninput = function() { markStale('breakeven'); };
 
     var beBtn = document.createElement("button");
     beBtn.type = "button";
     beBtn.className = "remove-x";
     beBtn.textContent = "×";
-    beBtn.onclick = function() { beRow.remove(); calcBE(); };
+    beBtn.onclick = function() { beRow.remove(); markStale('breakeven'); };
 
     beRow.appendChild(beLbl);
     beRow.appendChild(beInp);
@@ -997,7 +1069,7 @@ function confirmStepAdd() {
 
     document.getElementById("beMonthly").appendChild(beRow);
     closeStepModal();
-    calcBE();
+    markStale('breakeven');
 
   } else if (_activeModalTarget === "bundle") {
     var bName = document.getElementById("bAddName").value.trim();
@@ -1046,7 +1118,7 @@ function confirmStepAdd() {
     bBtn.type = "button";
     bBtn.className = "remove-x";
     bBtn.textContent = "×";
-    bBtn.onclick = function() { bRow.remove(); calcBundle(); };
+    bBtn.onclick = function() { bRow.remove(); markStale('bundle'); };
 
     bRow.appendChild(bLbl);
     bRow.appendChild(grid);
@@ -1054,7 +1126,7 @@ function confirmStepAdd() {
 
     document.getElementById("bItems").appendChild(bRow);
     closeStepModal();
-    calcBundle();
+    markStale('bundle');
   }
 }
 
@@ -1065,13 +1137,14 @@ function updateBundleLine(inputEl) {
   var cost = parseNum(row.querySelector(".bCost").value);
   var lineTotalEl = row.querySelector(".bLineTotal");
   if (lineTotalEl) lineTotalEl.innerText = fmt(qty * cost);
-  calcBundle();
+  markStale("bundle");
 }
 
 // -----------------------------------------------------------------------------
 // 1. PRICE CALCULATOR LOGIC
 // -----------------------------------------------------------------------------
 function calcPrice() {
+  _calculated.price = true;
   var b = parseNum(document.getElementById("bulk").value);
   var t = parseNum(document.getElementById("trans").value);
   var pk = parseNum(document.getElementById("pack").value);
@@ -1101,7 +1174,10 @@ function calcPrice() {
     ? "<div class='loss-banner'>LOSS — Your price " + fmt(sell) + " is BELOW your true cost " + fmt(tc) + ". You lose " + fmt(Math.abs(prof)) + " on every sale. Raise price to at least " + fmt(tc) + ".</div>"
     : "<div class='safe-banner'>SAFE — Your price " + fmt(sell) + " is above your true cost. You keep " + fmt(prof) + " per unit.</div>";
 
-  document.getElementById("priceOut").innerHTML =
+  var outEl = document.getElementById("priceOut");
+  outEl.className = "calc-pulse";
+  outEl.innerHTML =
+    "<div class='calc-badge'>✓ Calculated from your numbers just now</div>" +
     "<div class='result-card'>" +
       "<h3>Recommended: Charge " + fmt(rec) + " per unit</h3>" +
       "<p>You spent <b>" + fmt(spent) + "</b> in direct costs" + (lines.length ? " (" + lines.join(", ") + ")" : "") + ". " +
@@ -1130,7 +1206,7 @@ function calcPrice() {
   var dSell = document.getElementById("dSell");
   if (dSell) dSell.value = Math.round(sell).toLocaleString();
 
-  calcBundle();
+  outEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 function shareWA() {
@@ -1282,16 +1358,17 @@ function loadTmpl() {
   var h = "";
   for (var i = 0; i < list.length; i++) {
     h += "<div class='custom-row' style='background:#fff'>" +
-      "<label><input type='checkbox' checked class='sCheck' onchange='calcStartup()' style='width:18px;height:18px;margin-right:8px;vertical-align:middle'> " + list[i][0] + "</label>" +
+      "<label><input type='checkbox' checked class='sCheck' onchange='markStale(\"startup\")' style='width:18px;height:18px;margin-right:8px;vertical-align:middle'> " + list[i][0] + "</label>" +
       "<div class='muted'>" + list[i][1] + "</div>" +
-      "<input type='text' inputmode='numeric' class='sCost' value='" + list[i][2].toLocaleString() + "' style='margin-top:6px' oninput='calcStartup()'>" +
+      "<input type='text' inputmode='numeric' class='sCost' value='" + list[i][2].toLocaleString() + "' style='margin-top:6px' oninput='markStale(\"startup\")'>" +
     "</div>";
   }
   document.getElementById("sItems").innerHTML = h;
-  calcStartup();
+  markStale("startup");
 }
 
 function calcStartup() {
+  _calculated.startup = true;
   var total = 0;
   var allItemsTotal = 0;
   var rows = document.querySelectorAll("#sItems > div, #sCustom > div");
@@ -1314,23 +1391,29 @@ function calcStartup() {
   var cont = Math.round(total * pct / 100);
   var grand = total + cont;
 
-  document.getElementById("startupOut").innerHTML =
+  var outEl = document.getElementById("startupOut");
+  outEl.className = "calc-pulse";
+  outEl.innerHTML =
+    "<div class='calc-badge'>✓ Calculated from your numbers just now</div>" +
     "<div class='result-card'>" +
       "<h3>You need " + fmt(grand) + " to start</h3>" +
       "<p>Checked items: <b>" + fmt(total) + "</b>. Extra for surprises (" + pct + "%): <b>" + fmt(cont) + "</b>.</p>" +
       "<p class='muted'>Lean Day 1 budget: " + fmt(grand) + " | Full wish-list budget: " + fmt(allItemsTotal * (1 + pct / 100)) + "</p>" +
     "</div>" +
-    "<div class='next-action'><b>Next Step:</b> Go to Calculator 3 to see how many units you must sell to recover this " + fmt(grand) + ".</div>";
+    "<div class='next-action'><b>Next Step:</b> Go to Calculator 3 to see how many units you must sell to recover this " + fmt(grand) + ". (Pre-filled for you!)</div>";
 
   // Pre-fill Break-Even startup input
   var beStart = document.getElementById("beStart");
   if (beStart) beStart.value = grand.toLocaleString();
+
+  outEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 // -----------------------------------------------------------------------------
 // 3. BREAK-EVEN LOGIC (STARTUP + MONTHLY OVERHEAD)
 // -----------------------------------------------------------------------------
 function calcBE() {
+  _calculated.breakeven = true;
   var start = parseNum(document.getElementById("beStart").value);
   var prof = parseNum(document.getElementById("beProfit").value);
   var perWeek = Math.max(1, parseNum(document.getElementById("beWeek").value));
@@ -1342,9 +1425,14 @@ function calcBE() {
     monthlyOverhead += parseNum(overheadRows[i].value);
   }
 
+  var outEl = document.getElementById("beOut");
+  outEl.className = "calc-pulse";
+
   if (prof <= 0) {
-    document.getElementById("beOut").innerHTML =
-      "<div class='loss-banner'>You keep " + fmt(prof) + " from each sale. You will never recover your starting money or pay your bills. Raise your price in Calculator 1 first.</div>";
+    outEl.innerHTML =
+      "<div class='calc-badge'>✓ Calculated from your numbers just now</div>" +
+      "<div class='loss-banner'>You make zero or negative profit per unit (" + fmt(prof) + "). You will never recover your starting money or pay your bills. Raise your price in Calculator 1 first.</div>";
+    outEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     return;
   }
 
@@ -1357,20 +1445,24 @@ function calcBE() {
       "You must sell <b>" + monthlyUnits + " units EVERY MONTH</b> just to keep your shop open before making personal profit!</p>"
     : "";
 
-  document.getElementById("beOut").innerHTML =
+  outEl.innerHTML =
+    "<div class='calc-badge'>✓ Calculated from your numbers just now</div>" +
     "<div class='result-card'>" +
       "<h3>Sell " + units + " units in about " + weeks + " weeks</h3>" +
       "<p>Starting capital: <b>" + fmt(start) + "</b>. Profit per sale: <b>" + fmt(prof) + "</b>.<br>" +
       fmt(start) + " ÷ " + fmt(prof) + " = <b>" + units + " sales</b> needed to break even.</p>" +
       monthlyNotice +
     "</div>" +
-    "<div class='next-action'><b>Next Step:</b> If " + weeks + " weeks is too long, raise your price slightly or start with a leaner budget in Calculator 2.</div>";
+    "<div class='next-action'><b>Next Step:</b> If " + weeks + " weeks is too long, raise your price slightly in Calculator 1 or start with a leaner budget in Calculator 2.</div>";
+
+  outEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 // -----------------------------------------------------------------------------
 // 4. BUNDLE & DISCOUNT LOGIC (WITH DANGER ZONE TABLE)
 // -----------------------------------------------------------------------------
 function calcBundle() {
+  _calculated.bundle = true;
   var bp = parseNum(document.getElementById("bPrice").value);
   var sum = 0;
   var rows = document.querySelectorAll("#bItems .custom-row");
@@ -1390,10 +1482,15 @@ function calcBundle() {
   var dCost = parseNum(document.getElementById("dCost").value);
   var dPct = parseNum(document.getElementById("dPct").value);
 
+  var outEl = document.getElementById("bundleOut");
+  outEl.className = "calc-pulse";
+
   if (dPct >= 100) {
-    document.getElementById("bundleOut").innerHTML =
+    outEl.innerHTML =
+      "<div class='calc-badge'>✓ Calculated from your numbers just now</div>" +
       "<div class='loss-banner'>A 100% discount means free. You will lose everything. Use a smaller discount (e.g. 10%).</div>";
     renderDangerZoneTable(dSell, dCost);
+    outEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     return;
   }
 
@@ -1408,13 +1505,15 @@ function calcBundle() {
     ? "<div class='loss-banner'>DISCOUNT LOSS — After " + dPct + "% off (" + fmt(dPrice) + "), you lose " + fmt(Math.abs(dProf)) + " per unit below cost (" + fmt(dCost) + "). Lower discount!</div>"
     : "<div class='safe-banner'>DISCOUNT SAFE — After " + dPct + "% off (" + fmt(dPrice) + "), you still keep " + fmt(dProf) + " profit per unit.</div>";
 
-  document.getElementById("bundleOut").innerHTML =
+  outEl.innerHTML =
+    "<div class='calc-badge'>✓ Calculated from your numbers just now</div>" +
     "<div class='result-card'>" +
       "<h3>Bundle: Charge " + fmt(bp) + " (Items Cost: " + fmt(sum) + ")</h3>" +
       "<p>Discount: Charge " + fmt(dPrice) + " after " + dPct + "% off (Cost: " + fmt(dCost) + ").</p>" +
     "</div>" + bBanner + dBanner;
 
   renderDangerZoneTable(dSell, dCost);
+  outEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 function renderDangerZoneTable(price, cost) {
@@ -1466,7 +1565,7 @@ function forceAppRefresh() {
 // REGISTER SERVICE WORKER WITH AUTOMATIC UPDATE CHECK
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
-    navigator.serviceWorker.register('sw.js?v=1.0.3-20261121').then(function(reg) {
+    navigator.serviceWorker.register('sw.js?v=1.0.4-20261121').then(function(reg) {
       reg.update(); // Force check for updated sw.js immediately
     }).catch(function(err) {
       console.log('SW registration note:', err);
@@ -1474,9 +1573,33 @@ if ('serviceWorker' in navigator) {
   });
 }
 
+function initInputListeners() {
+  var priceInputs = ['pname', 'bulk', 'trans', 'pack', 'lab', 'waste', 'profit', 'sell'];
+  for (var i = 0; i < priceInputs.length; i++) {
+    var el = document.getElementById(priceInputs[i]);
+    if (el) el.addEventListener('input', function() { markStale('price'); });
+  }
+
+  var sCont = document.getElementById("sCont");
+  if (sCont) sCont.addEventListener('input', function() { markStale('startup'); });
+
+  var beInputs = ['beStart', 'beProfit', 'beWeek'];
+  for (var j = 0; j < beInputs.length; j++) {
+    var bEl = document.getElementById(beInputs[j]);
+    if (bEl) bEl.addEventListener('input', function() { markStale('breakeven'); });
+  }
+
+  var bundleInputs = ['bPrice', 'dSell', 'dCost', 'dPct'];
+  for (var k = 0; k < bundleInputs.length; k++) {
+    var bunEl = document.getElementById(bundleInputs[k]);
+    if (bunEl) bunEl.addEventListener('input', function() { markStale('bundle'); });
+  }
+}
+
 // INITIALIZATION
 loadTmpl();
 renderSaved();
+initInputListeners();
 window._idx = 0;
 renderTabs();
 </script>
