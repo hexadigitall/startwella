@@ -127,11 +127,14 @@ The following tasks represent the exact delta between the current codebase state
  │    ├── [x] Implement 20 standard automated test cases (edge cases, floating-point, waste limits)
  │    └── [x] Verify 100% test pass via npm test (20/20 tests passing)
  │
- └── [ ] 5. Distribution Preparation
+ └── [x] 5. Distribution Preparation
       ├── [x] Configure Desktop bundle scaffold (src-tauri/tauri.conf.json)
       ├── [x] Configure Mobile bundle scaffold (capacitor.config.json)
-      ├── [ ] Push main & v1 branch to GitHub (https://github.com/hexadigitall/startwella.git)
-      └── [ ] Connect GitHub repository to Vercel for live deployment
+      ├── [x] Push main & v1 branch to GitHub (https://github.com/hexadigitall/startwella.git)
+      ├── [x] Connect GitHub repository to Vercel for live deployment (https://startwella.vercel.app)
+      ├── [x] Implement Android hardware back-button listener with modal & step stack
+      ├── [x] Connect Native & Web Share Sheet bridge (@capacitor/share & navigator.share)
+      └── [x] Implement CSV spreadsheet data exports (Price List & Startup Budget)
 ```
 
 ---

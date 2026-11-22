@@ -273,6 +273,7 @@
 
     <button type="button" onclick="calcStartup()">Add up — how much do I need?</button>
     <div id="startupOut"></div>
+    <button type="button" onclick="exportStartupCSV()" class="ghost" style="margin-top:10px">📥 Export Startup Budget (CSV / Excel)</button>
 
     <div class="step-nav">
       <button type="button" class="ghost" onclick="prevCalc()">Back: Price Calculator</button>
@@ -377,9 +378,10 @@
     <div class="muted">Load puts it back into Calculator 1. Share sends it on WhatsApp. Delete removes it.</div>
     <div id="saved" style="margin-top:12px"></div>
     <div class="actions-grid">
-      <button type="button" onclick="shareFullPriceList()" style="background:#25D366">Share Price List (WhatsApp)</button>
-      <button type="button" onclick="exportPDF()" class="ghost">Export Price List (PDF)</button>
+      <button type="button" onclick="shareFullPriceList()" style="background:#25D366">Share Price List</button>
+      <button type="button" onclick="exportPDF()" class="ghost">Export as PDF</button>
     </div>
+    <button type="button" onclick="exportPriceListCSV()" class="ghost" style="margin-top:8px">📥 Export Price List (CSV / Excel)</button>
     <div class="muted" style="margin-top:10px">Saved locally in your device storage. Works offline.</div>
   </section>
 
@@ -1209,6 +1211,32 @@ function calcPrice() {
   outEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
+// NATIVE MOBILE & WEB SHARE BRIDGE
+async function shareContent(title, text) {
+  if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Share) {
+    try {
+      await window.Capacitor.Plugins.Share.share({
+        title: title,
+        text: text,
+        dialogTitle: title
+      });
+      return;
+    } catch (e) {
+      console.log("Capacitor share note:", e);
+    }
+  }
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: title, text: text });
+      return;
+    } catch (e) {
+      console.log("Web share note:", e);
+    }
+  }
+  // WhatsApp Fallback
+  window.open("https://wa.me/?text=" + encodeURIComponent(text), "_blank");
+}
+
 function shareWA() {
   if (!window._last) calcPrice();
   var l = window._last;
@@ -1218,7 +1246,7 @@ function shareWA() {
              "• My price: " + fmt(l.sell) + "\n" +
              "• Profit per unit: " + fmt(l.prof) + "\n\n" +
              "Start well. Price right. Grow steady.";
-  window.open("https://wa.me/?text=" + encodeURIComponent(text), "_blank");
+  shareContent("StartWella Price Card: " + l.name, text);
 }
 
 function saveProduct() {
@@ -1287,8 +1315,9 @@ function shareSaved(i) {
   var text = "StartWella Price Card: " + x.name + "\n" +
              "• Price: " + fmt(x.sell || x.rec) + "\n" +
              "• True Cost: " + fmt(x.tc) + "\n" +
-             "• Profit: " + fmt(x.prof) + " per unit";
-  window.open("https://wa.me/?text=" + encodeURIComponent(text), "_blank");
+             "• Profit: " + fmt(x.prof) + " per unit\n\n" +
+             "Start well. Price right. Grow steady.";
+  shareContent("StartWella Price Card: " + x.name, text);
 }
 
 function deleteSaved(i) {
@@ -1308,11 +1337,136 @@ function shareFullPriceList() {
   }
   lines.push("----------------------------------");
   lines.push("Reply to this message to order!");
-  window.open("https://wa.me/?text=" + encodeURIComponent(lines.join("\n")), "_blank");
+  shareContent("StartWella Official Price List", lines.join("\n"));
 }
 
 function exportPDF() {
   window.print();
+}
+
+// -----------------------------------------------------------------------------
+// SPREADSHEET / CSV DATA EXPORT ENGINE (DESKTOP & MOBILE COMPLIANT)
+// -----------------------------------------------------------------------------
+function downloadCSV(filename, csvContent) {
+  var blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+  if (navigator.msSaveBlob) {
+    navigator.msSaveBlob(blob, filename);
+  } else {
+    var link = document.createElement("a");
+    if (link.download !== undefined) {
+      var url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", filename);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+  }
+}
+
+function exportPriceListCSV() {
+  var a = [];
+  try {
+    a = JSON.parse(localStorage.getItem("startwella:products:v1") || "[]");
+  } catch (e) { a = []; }
+
+  if (!a.length) {
+    alert("No saved products yet. Calculate and save at least one product in Calculator 1.");
+    return;
+  }
+
+  var sym = CURR_SYMBOLS[_curr] || "₦";
+  var headers = ["Product Name", "True Cost (" + sym + ")", "Lowest Price 10% (" + sym + ")", "Normal Price 25% (" + sym + ")", "Premium Price 40% (" + sym + ")", "Your Selling Price (" + sym + ")", "Profit Per Unit (" + sym + ")", "Gross Margin (%)", "Date Saved"];
+  
+  var rows = a.map(function(item) {
+    var tc = item.tc || 0;
+    var rec = item.rec || (tc * 1.25);
+    var sell = item.sell || rec;
+    var prof = item.prof || (sell - tc);
+    var margin = sell > 0 ? Math.round((prof / sell) * 100) : 0;
+    var name = '"' + (item.name || "Product").replace(/"/g, '""') + '"';
+    var d = item.date ? item.date : new Date().toLocaleDateString();
+
+    return [
+      name,
+      Math.round(tc),
+      Math.round(tc * 1.10),
+      Math.round(tc * 1.25),
+      Math.round(tc * 1.40),
+      Math.round(sell),
+      Math.round(prof),
+      margin + "%",
+      d
+    ].join(",");
+  });
+
+  var csv = headers.join(",") + "\n" + rows.join("\n");
+  var filename = "StartWella_Price_List_" + new Date().toISOString().slice(0, 10) + ".csv";
+  downloadCSV(filename, csv);
+}
+
+function exportStartupCSV() {
+  var sym = CURR_SYMBOLS[_curr] || "₦";
+  var rowsData = [];
+  var rows = document.querySelectorAll("#sItems > div, #sCustom > div");
+  var totalChecked = 0;
+
+  for (var i = 0; i < rows.length; i++) {
+    var cb = rows[i].querySelector("input[type=checkbox]");
+    var amt = parseNum(rows[i].querySelector(".sCost") ? rows[i].querySelector(".sCost").value : 0);
+    var labelEl = rows[i].querySelector("label");
+    var labelText = labelEl ? labelEl.textContent.trim() : "Item " + (i + 1);
+    var mutedEl = rows[i].querySelector(".muted");
+    var desc = mutedEl ? mutedEl.textContent.trim() : "";
+    var isIncluded = cb ? cb.checked : true;
+
+    if (isIncluded) totalChecked += amt;
+
+    rowsData.push([
+      '"' + labelText.replace(/"/g, '""') + '"',
+      '"' + desc.replace(/"/g, '""') + '"',
+      isIncluded ? "YES (Day 1)" : "NO (Buy Later)",
+      Math.round(amt)
+    ].join(","));
+  }
+
+  var pct = parseNum(document.getElementById("sCont").value);
+  var cont = Math.round(totalChecked * pct / 100);
+  var grand = totalChecked + cont;
+
+  var headers = ["Startup Item Name", "Description / Purpose", "Included for Launch", "Estimated Cost (" + sym + ")"];
+  var summaryRows = [
+    "",
+    ["Subtotal (Day 1 Items)", "", "", totalChecked].join(","),
+    ["Surprise Buffer (" + pct + "%)", "", "", cont].join(","),
+    ["TOTAL CASH NEEDED TO LAUNCH", "", "", grand].join(",")
+  ];
+
+  var csv = headers.join(",") + "\n" + rowsData.join("\n") + "\n" + summaryRows.join("\n");
+  var filename = "StartWella_Startup_Budget_" + new Date().toISOString().slice(0, 10) + ".csv";
+  downloadCSV(filename, csv);
+}
+
+// -----------------------------------------------------------------------------
+// NATIVE MOBILE & BACK BUTTON HANDLING (CAPACITOR BRIDGE)
+// -----------------------------------------------------------------------------
+function initNativeAppBridge() {
+  if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
+    window.Capacitor.Plugins.App.addListener('backButton', function() {
+      var modal = document.getElementById("stepModal");
+      if (modal && modal.classList.contains("open")) {
+        closeStepModal();
+        return;
+      }
+      if (window._idx > 0) {
+        prevCalc();
+      } else {
+        window.Capacitor.Plugins.App.exitApp();
+      }
+    });
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -1600,6 +1754,7 @@ function initInputListeners() {
 loadTmpl();
 renderSaved();
 initInputListeners();
+initNativeAppBridge();
 window._idx = 0;
 renderTabs();
 </script>

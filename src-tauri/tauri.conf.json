@@ -1,0 +1,51 @@
+{
+  "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/dev/tooling/cli/schema.json",
+  "build": {
+    "beforeDevCommand": "",
+    "beforeBuildCommand": "",
+    "devPath": "./",
+    "distDir": "./"
+  },
+  "package": {
+    "productName": "StartWella",
+    "version": "1.0.4"
+  },
+  "tauri": {
+    "allowlist": {
+      "all": false,
+      "fs": {
+        "all": false,
+        "readFile": true,
+        "writeFile": true,
+        "scope": ["$DOCUMENT/*", "$DOWNLOAD/*", "$DESKTOP/*"]
+      },
+      "dialog": {
+        "all": false,
+        "save": true,
+        "open": true
+      }
+    },
+    "bundle": {
+      "active": true,
+      "targets": "all",
+      "identifier": "com.startwella.desktop",
+      "icon": [
+        "assets/logo-32.png",
+        "assets/logo-128.png",
+        "assets/logo-256.png",
+        "assets/favicon.ico"
+      ]
+    },
+    "windows": [
+      {
+        "title": "StartWella — Pricing & Startup Toolkit",
+        "width": 500,
+        "height": 840,
+        "minWidth": 380,
+        "minHeight": 600,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ]
+  }
+}

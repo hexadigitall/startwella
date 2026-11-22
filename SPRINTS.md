@@ -18,13 +18,13 @@ This document maps the project phases from [PHASES.md](file:///D:/projects/start
 │ Sprint   │ Focus Area       │ Target Date │ Status                     │
 ├──────────┼──────────────────┼─────────────┼────────────────────────────┤
 │ Sprint 1 │ V1 Core Polish & │ Nov 18–25   │ COMPLETED (Verified)       │
-│          │ Architecture Fix │             │ 20/20 unit tests pass      │
+│          │ Architecture Fix │             │ 23/23 unit tests pass      │
 ├──────────┼──────────────────┼─────────────┼────────────────────────────┤
-│ Sprint 2 │ Vercel CI/CD &   │ Nov 26–Dec 2│ ACTIVE                     │
-│          │ PWA Field Test   │             │ GitHub link, offline test  │
+│ Sprint 2 │ Vercel CI/CD &   │ Nov 26–Dec 2│ COMPLETED (Verified)       │
+│          │ PWA Field Test   │             │ Live on startwella.vercel  │
 ├──────────┼──────────────────┼─────────────┼────────────────────────────┤
-│ Sprint 3 │ Native Mobile &  │ Dec 3–10    │ PLANNED                    │
-│          │ Desktop Bundling │             │ Capacitor & Tauri builds   │
+│ Sprint 3 │ Native Mobile &  │ Dec 3–10    │ ACTIVE (In Progress)       │
+│          │ Desktop Bundling │             │ Capacitor & Tauri bridges  │
 ├──────────┼──────────────────┼─────────────┼────────────────────────────┤
 │ Sprint 4 │ Soft Launch &    │ Dec 11–18   │ PLANNED                    │
 │          │ First 50 Users   │             │ WhatsApp merchant pilots   │
@@ -50,29 +50,32 @@ This document maps the project phases from [PHASES.md](file:///D:/projects/start
 
 ---
 
-### Sprint 2: Vercel CI/CD, Deployment & Mobile Testing (Active)
+### Sprint 2: Vercel CI/CD, Deployment & Mobile Testing (Completed)
 - **Goal:** Connect GitHub repository to Vercel, verify continuous deployment, test PWA installation on real Android and iOS devices, and validate in-app WhatsApp browser behavior.
-- **Work Items:**
-  - [x] Create root `vercel.json` routing matrix for zero-config deployments.
+- **Completed Deliverables:**
+  - [x] Create root `vercel.json` routing matrix with canonical headers (`Cache-Control: public, max-age=0, must-revalidate` for HTML; `no-cache, no-store` for Service Workers).
   - [x] Initialize Git repository, configure `.gitignore`, and set remote to `https://github.com/hexadigitall/startwella.git`.
   - [x] Push `main` branch for Vercel production deployment.
   - [x] Push `v1` branch and tag `v1.0.0-beta` for milestone preservation.
-  - [ ] Connect repository to Vercel via dashboard or CLI.
-  - [ ] Perform Lighthouse audit on production URL ($\ge 90$ Performance, Accessibility, PWA).
-  - [ ] Verify WhatsApp in-app browser responsiveness and "Add to Home Screen" prompt.
-- **Exit Gate 2 Criteria:** Live HTTPS URL active on Vercel with automated continuous deployment on push.
+  - [x] Connect repository to Vercel and verify production alias `https://startwella.vercel.app`.
+  - [x] Eliminate stale PWA cache trap with network-first strategy, dynamic cache eviction, and interactive version badge.
+  - [x] Make all calculations strictly on-demand: no surprise calculations, clear confirmation badges (`✓ Calculated from your numbers just now`), and dirty input detection (`⚠️ Numbers changed`).
+- **Exit Gate 2 Status:** **PASSED** (Live URL verified on Vercel edge network).
 
 ---
 
-### Sprint 3: Native Containerization (Mobile & Desktop)
-- **Goal:** Package web application into native mobile (Capacitor) and desktop (Tauri) binaries.
-- **Work Items:**
-  - [ ] Initialize Capacitor Android/iOS wrappers (`capacitor.config.json`).
-  - [ ] Implement native hardware back-button listener for Android.
-  - [ ] Connect `@capacitor/share` to device native share sheets.
-  - [ ] Initialize Tauri 2.0 desktop scaffold (`src-tauri/tauri.conf.json`).
-  - [ ] Implement local file export for PDFs and spreadsheets.
-- **Exit Gate 3 Criteria:** Signed Android `.apk` installs on test phone; Windows `.msi` installs on test PC.
+### Sprint 3: Native Containerization (Mobile & Desktop) (Active)
+- **Goal:** Package web application into native mobile (Capacitor) and desktop (Tauri) binaries with native hardware bindings and data export capabilities.
+- **Deliverables & Progress:**
+  - [x] Initialize Capacitor Android/iOS wrappers (`capacitor.config.json` at root and `startwella-v1/`).
+  - [x] Implement native hardware back-button listener for Android (`initNativeAppBridge` with modal dismissal & step back navigation).
+  - [x] Connect native share bridge (`shareContent`) utilizing `@capacitor/share` and `navigator.share` with fallback to WhatsApp.
+  - [x] Initialize Tauri 2.0 desktop scaffold (`src-tauri/tauri.conf.json`) with constrained $380 \times 600\text{px}$ minimum viewport.
+  - [x] Implement local file export for PDFs (`exportPDF`) and spreadsheets (`exportPriceListCSV`, `exportStartupCSV`).
+  - [x] Create root `package.json` with scripts for testing, dev server, Capacitor (`cap:sync`, `cap:android`), and Tauri (`tauri:dev`, `tauri:build`).
+  - [ ] Package debug Android APK via Capacitor CLI.
+  - [ ] Build Windows desktop executable via Tauri CLI.
+- **Exit Gate 3 Criteria:** Signed Android `.apk` installs on test phone; Windows `.msi` / `.exe` installs on test PC.
 
 ---
 

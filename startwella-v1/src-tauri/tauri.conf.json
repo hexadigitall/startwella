@@ -3,12 +3,12 @@
   "build": {
     "beforeDevCommand": "",
     "beforeBuildCommand": "",
-    "devPath": "../",
-    "distDir": "../"
+    "devPath": "./",
+    "distDir": "./"
   },
   "package": {
     "productName": "StartWella",
-    "version": "1.0.0"
+    "version": "1.0.4"
   },
   "tauri": {
     "allowlist": {
@@ -17,7 +17,7 @@
         "all": false,
         "readFile": true,
         "writeFile": true,
-        "scope": ["$DOCUMENT/*", "$DOWNLOAD/*"]
+        "scope": ["$DOCUMENT/*", "$DOWNLOAD/*", "$DESKTOP/*"]
       },
       "dialog": {
         "all": false,
@@ -30,11 +30,10 @@
       "targets": "all",
       "identifier": "com.startwella.desktop",
       "icon": [
-        "icons/32x32.png",
-        "icons/128x128.png",
-        "icons/128x128@2x.png",
-        "icons/icon.icns",
-        "icons/icon.ico"
+        "assets/logo-32.png",
+        "assets/logo-128.png",
+        "assets/logo-256.png",
+        "assets/favicon.ico"
       ]
     },
     "windows": [
